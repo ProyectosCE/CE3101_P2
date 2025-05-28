@@ -1,6 +1,6 @@
 # Instituto Tecnológico de Costa Rica
 
-## Proyecto #2 - GymTEC
+## Proyecto 2 - GymTEC
 
 ### Bases de Datos (CE3101)
 

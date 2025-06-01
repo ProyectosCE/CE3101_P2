@@ -4,13 +4,27 @@ export default function Layout() {
   return (
     <Drawer
       screenOptions={{
-        headerShown: false, // Oculta el header por defecto en todas las pantallas
+        headerShown: false,
       }}
     >
-      <Drawer.Screen name="home" />
-      <Drawer.Screen name="search" />
-      <Drawer.Screen name="sync" />
-      <Drawer.Screen name="profile" />
+      <Drawer.Screen name="Inicio" />
+      <Drawer.Screen name="Buscar Clases" />
+      <Drawer.Screen name="Sincronización" />
+      <Drawer.Screen name="Perfil" />
+
+      {/* Ocultar las pantallas que no deben aparecer en el Drawer */}
+      <Drawer.Screen
+        name="index"
+        options={{ drawerItemStyle: { display: 'none' } }}
+      />
+      <Drawer.Screen
+        name="login"
+        options={{ drawerItemStyle: { display: 'none' } }}
+      />
+      <Drawer.Screen
+        name="register"
+        options={{ drawerItemStyle: { display: 'none' } }}
+      />
     </Drawer>
   );
 }

@@ -59,7 +59,7 @@ export default function SearchScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Header userName="José" onMenuPress={() => navigation.dispatch(DrawerActions.openDrawer())} />
+      <Header title="Búsqueda de Clases" onMenuPress={() => navigation.dispatch(DrawerActions.openDrawer())} />
       <ClassSearchForm onSearch={handleSearch} />
       <View style={styles.resultsContainer}>
         {resultados.map((clase, index) => (

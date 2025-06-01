@@ -44,13 +44,19 @@ export default function ClassSearchForm({ onSearch }: ClassSearchFormProps) {
       <View style={styles.pickerWrapper}>
         <Picker
           selectedValue={tipo}
-          onValueChange={(itemValue) => setTipo(itemValue)}>
-          <Picker.Item label="Seleccione una opción" value="" />
-          <Picker.Item label="Indoor Cycling" value="Indoor Cycling" />
-          <Picker.Item label="Pilates" value="Pilates" />
-          <Picker.Item label="Yoga" value="Yoga" />
-          <Picker.Item label="Zumba" value="Zumba" />
-          <Picker.Item label="Natación" value="Natación" />
+          onValueChange={(itemValue) => setTipo(itemValue)}
+          style={styles.pickerText}>
+          <Picker.Item label="Seleccione una clase" value="" color="#999" />
+          <Picker.Item label="Indoor Cycling" value="Indoor Cycling" color="#000" />
+          <Picker.Item label="Pilates" value="Pilates" color="#000" />
+          <Picker.Item label="Yoga" value="Yoga" color="#000" />
+          <Picker.Item label="Zumba" value="Zumba" color="#000" />
+          <Picker.Item label="Natación" value="Natación" color="#000" />
+          <Picker.Item label="Crossfit" value="Crossfit" color="#000" />
+          <Picker.Item label="HIIT" value="HIIT" color="#000" />
+          <Picker.Item label="Funcional" value="Funcional" color="#000" />
+          <Picker.Item label="TRX" value="TRX" color="#000" />
+          <Picker.Item label="Step" value="Step" color="#000" />
         </Picker>
       </View>
 
@@ -102,9 +108,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   pickerWrapper: {
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#e6e6e6',
     borderRadius: 8,
     marginBottom: 12,
+  },
+  pickerText: {
+    color: '#333',
+    fontSize: 16,
+    paddingHorizontal: Platform.OS === 'android' ? 10 : 0,
   },
   button: {
     backgroundColor: Colors.primary,

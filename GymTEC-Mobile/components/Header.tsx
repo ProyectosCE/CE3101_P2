@@ -2,13 +2,21 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
 
-export default function Header({ onMenuPress, userName = 'Cliente' }: { onMenuPress: () => void; userName?: string }) {
+interface HeaderProps {
+  onMenuPress: () => void;
+  userName?: string;
+  title?: string;
+}
+
+export default function Header({ onMenuPress, userName, title }: HeaderProps) {
+  const displayTitle = title ? title : `Bienvenido a GymTEC${userName ? `, ${userName}` : ''}`;
+
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={onMenuPress} style={styles.menuButton}>
         <Ionicons name="menu" size={28} color="#fff" />
       </TouchableOpacity>
-      <Text style={styles.title}>Bienvenido a GymTEC, {userName}</Text>
+      <Text style={styles.title}>{displayTitle}</Text>
     </View>
   );
 }

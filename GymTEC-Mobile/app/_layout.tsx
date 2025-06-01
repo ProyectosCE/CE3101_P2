@@ -7,12 +7,12 @@ export default function Layout() {
         headerShown: false,
       }}
     >
-      <Drawer.Screen name="home" />
-      <Drawer.Screen name="search" />
-      <Drawer.Screen name="sync" />
-      <Drawer.Screen name="profile" />
+      <Drawer.Screen name="home" options={{ title: 'Inicio' }} />
+      <Drawer.Screen name="search" options={{ title: 'Buscar Clases' }} />
+      <Drawer.Screen name="sync" options={{ title: 'Sincronizar' }} />
+      <Drawer.Screen name="profile" options={{ title: 'Perfil' }} />
 
-      {/* Rutas protegidas: ocultas y sin gesto para abrir el drawer */}
+      {/* Rutas protegidas: ocultas y con swipe desactivado */}
       <Drawer.Screen
         name="index"
         options={{

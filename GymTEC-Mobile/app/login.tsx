@@ -11,7 +11,7 @@ export default function LoginScreen() {
 
   const handleLogin = () => {
     if (correo && password) {
-      Alert.alert('Login exitoso', `Bienvenido ${correo}`);
+      router.push(ROUTES.HOME);
     } else {
       Alert.alert('Error', 'Por favor complete ambos campos');
     }

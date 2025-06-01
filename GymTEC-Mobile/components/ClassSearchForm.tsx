@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import { useState } from 'react';
 import { Colors } from '../constants/colors';
+import { Picker } from '@react-native-picker/picker';
 
 interface ClassSearchFormProps {
   onSearch: (filters: {
@@ -17,60 +17,65 @@ export default function ClassSearchForm({ onSearch }: ClassSearchFormProps) {
   const [tipo, setTipo] = useState('');
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFin, setFechaFin] = useState('');
+  const [error, setError] = useState(false);
+
+  const handleSearch = () => {
+    if (!sucursal && !tipo && !fechaInicio && !fechaFin) {
+      setError(true);
+      return;
+    }
+    setError(false);
+    onSearch({ sucursal, tipo, fechaInicio, fechaFin });
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>Buscar Clases</Text>
+      <Text style={styles.sectionTitle}>Filtros de Búsqueda</Text>
 
       <Text style={styles.label}>Sucursal</Text>
       <TextInput
         style={styles.input}
-        placeholder="Sucursal"
+        placeholder="Ingrese la sucursal (ej: San José)"
         value={sucursal}
         onChangeText={setSucursal}
       />
 
       <Text style={styles.label}>Tipo de Clase</Text>
-      {Platform.OS === 'android' ? (
-        <View style={styles.pickerWrapper}>
-          <Picker
-            selectedValue={tipo}
-            onValueChange={(itemValue) => setTipo(itemValue)}>
-            <Picker.Item label="Seleccione tipo de clase" value="" />
-            <Picker.Item label="Indoor Cycling" value="Indoor Cycling" />
-            <Picker.Item label="Pilates" value="Pilates" />
-            <Picker.Item label="Yoga" value="Yoga" />
-            <Picker.Item label="Zumba" value="Zumba" />
-            <Picker.Item label="Natación" value="Natación" />
-          </Picker>
-        </View>
-      ) : (
-        <TextInput
-          style={styles.input}
-          placeholder="Tipo de clase"
-          value={tipo}
-          onChangeText={setTipo}
-        />
-      )}
+      <View style={styles.pickerWrapper}>
+        <Picker
+          selectedValue={tipo}
+          onValueChange={(itemValue) => setTipo(itemValue)}>
+          <Picker.Item label="Seleccione una opción" value="" />
+          <Picker.Item label="Indoor Cycling" value="Indoor Cycling" />
+          <Picker.Item label="Pilates" value="Pilates" />
+          <Picker.Item label="Yoga" value="Yoga" />
+          <Picker.Item label="Zumba" value="Zumba" />
+          <Picker.Item label="Natación" value="Natación" />
+        </Picker>
+      </View>
 
-      <Text style={styles.label}>Periodo de Búsqueda</Text>
+      <Text style={styles.label}>Fecha de Inicio</Text>
       <TextInput
         style={styles.input}
-        placeholder="Fecha Inicio (YYYY-MM-DD)"
+        placeholder="Ej: 2025-06-01"
         value={fechaInicio}
         onChangeText={setFechaInicio}
       />
+
+      <Text style={styles.label}>Fecha de Fin</Text>
       <TextInput
         style={styles.input}
-        placeholder="Fecha Fin (YYYY-MM-DD)"
+        placeholder="Ej: 2025-06-30"
         value={fechaFin}
         onChangeText={setFechaFin}
       />
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => onSearch({ sucursal, tipo, fechaInicio, fechaFin })}>
-        <Text style={styles.buttonText}>Buscar</Text>
+      {error && (
+        <Text style={styles.errorText}>Ingrese al menos un campo para realizar la búsqueda.</Text>
+      )}
+
+      <TouchableOpacity style={styles.button} onPress={handleSearch}>
+        <Text style={styles.buttonText}>Buscar Clases</Text>
       </TouchableOpacity>
     </View>
   );
@@ -111,5 +116,9 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 8,
   },
 });

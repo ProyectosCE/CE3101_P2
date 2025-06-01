@@ -7,5 +7,5 @@ export interface Usuario {
   imc: number;
   direccion: string;
   correo: string;
-  password: string; // almacenado encriptado (MD5)
+  password: string; 
 }

@@ -37,6 +37,9 @@ export default function RegisterScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.push(ROUTES.LOGIN)}>
+        <Text style={styles.backButtonText}>← Volver</Text>
+      </TouchableOpacity>
       <Logo />
       <Text style={styles.title}>Registro de Cliente</Text>
       {[
@@ -50,15 +53,17 @@ export default function RegisterScreen() {
         { key: 'correo', label: 'Correo electrónico' },
         { key: 'password', label: 'Contraseña', secure: true },
       ].map(({ key, label, secure }) => (
-        <TextInput
-          key={key}
-          style={styles.input}
-          placeholder={label}
-          onChangeText={text => handleChange(key, text)}
-          secureTextEntry={secure}
-          keyboardType={key === 'edad' || key === 'peso' || key === 'imc' ? 'numeric' : 'default'}
-          autoCapitalize="none"
-        />
+        <View key={key} style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>{label}</Text>
+          <TextInput
+            style={styles.input}
+            placeholder={label}
+            onChangeText={text => handleChange(key, text)}
+            secureTextEntry={secure}
+            keyboardType={key === 'edad' || key === 'peso' || key === 'imc' ? 'numeric' : 'default'}
+            autoCapitalize="none"
+          />
+        </View>
       ))}
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>Registrarse</Text>
@@ -73,18 +78,35 @@ const styles = StyleSheet.create({
     padding: 24,
     alignItems: 'center',
   },
+  backButton: {
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
+  backButtonText: {
+    color: Colors.primary,
+    fontSize: 16,
+  },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
     color: Colors.primary,
     marginVertical: 12,
   },
+  inputGroup: {
+    width: '100%',
+    marginBottom: 10,
+  },
+  inputLabel: {
+    marginBottom: 4,
+    fontSize: 14,
+    color: Colors.text,
+  },
   input: {
     width: '100%',
     backgroundColor: '#f2f2f2',
     padding: 12,
     borderRadius: 8,
-    marginBottom: 12,
+    fontSize: 16,
   },
   button: {
     backgroundColor: Colors.primary,

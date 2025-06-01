@@ -12,8 +12,6 @@ export default function LoginScreen() {
   const handleLogin = () => {
     if (correo && password) {
       Alert.alert('Login exitoso', `Bienvenido ${correo}`);
-      // Redirigir a pantalla principal cuando esté lista
-      // router.push(ROUTES.HOME);
     } else {
       Alert.alert('Error', 'Por favor complete ambos campos');
     }
@@ -23,22 +21,32 @@ export default function LoginScreen() {
     <View style={styles.container}>
       <Logo />
       <Text style={styles.title}>Iniciar Sesión</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Correo electrónico"
-        onChangeText={setCorreo}
-        autoCapitalize="none"
-        keyboardType="email-address"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Contraseña"
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.inputLabel}>Correo electrónico</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Correo electrónico"
+          onChangeText={setCorreo}
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
+      </View>
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.inputLabel}>Contraseña</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Contraseña"
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+      </View>
+
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Ingresar</Text>
       </TouchableOpacity>
+
       <TouchableOpacity onPress={() => router.push(ROUTES.REGISTER)}>
         <Text style={styles.link}>¿No tienes cuenta? Regístrate</Text>
       </TouchableOpacity>
@@ -60,12 +68,20 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     color: Colors.primary,
   },
+  inputGroup: {
+    width: '100%',
+    marginBottom: 10,
+  },
+  inputLabel: {
+    marginBottom: 4,
+    fontSize: 14,
+    color: Colors.text,
+  },
   input: {
     width: '100%',
     backgroundColor: '#f2f2f2',
     padding: 12,
     borderRadius: 8,
-    marginBottom: 12,
     fontSize: 16,
   },
   button: {

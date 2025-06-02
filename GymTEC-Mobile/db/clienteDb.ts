@@ -58,7 +58,7 @@ export const updateCliente = async (cliente: {
   correo: string;
 }) => {
   await db.runAsync(
-    `UPDATE clientes SET edad = ?, peso = ?, imc = ?, direccion = ?, sincronizado = 0 WHERE cedula = ?;`,
+    `UPDATE clientes SET edad = ?, peso = ?, imc = ?, direccion = ?, sincronizado = 0 WHERE correo = ?;`,
     [cliente.edad, cliente.peso, cliente.imc, cliente.direccion, cliente.correo]
   );
 };

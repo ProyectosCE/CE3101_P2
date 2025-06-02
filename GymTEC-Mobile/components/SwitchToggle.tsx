@@ -17,6 +17,7 @@ export default function SwitchToggle({ label, value, onValueChange }: SwitchTogg
         ios_backgroundColor="#ccc"
         onValueChange={onValueChange}
         value={value}
+        style={styles.switch}
       />
     </View>
   );
@@ -30,13 +31,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
     borderRadius: 8,
     marginBottom: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
   },
   label: {
     fontSize: 16,
     color: Colors.text,
     fontWeight: '500',
+    marginBottom: 10,
+  },
+  switch: {
+    alignSelf: 'flex-start',
   },
 });

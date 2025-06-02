@@ -1,6 +1,161 @@
-﻿namespace GymTec_api.Data
+﻿using GymTec_api.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace GymTec_api.Data
 {
-    public class AppDbContext
+    public class AppDbContext : DbContext
     {
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        {
+        }
+        // DbSets para los modelos
+        public DbSet<Clase> Clase { get; set; }
+        public DbSet<Cliente> Cliente { get; set; }
+        public DbSet<ClienteXClase> ClienteXClase { get; set; }
+        public DbSet<DetallePlan> detallePlan { get; set; }
+        public DbSet<Empleado> Empleado { get; set; }
+        public DbSet<Maquina> Maquina { get; set; }
+        public DbSet<Planilla> Planilla { get; set; }
+        public DbSet<PlanTrabajo> PlanTrabajo { get; set; }
+        public DbSet<Producto> Producto { get; set; }
+        public DbSet<Puesto> Puesto { get; set; }
+        public DbSet<Servicio> Servicio { get; set; }
+        public DbSet<Sucursal> Sucursal { get; set; }
+        public DbSet<SucursalXProducto> SucursalXProducto { get; set; }
+        public DbSet<SucursalXServicio> SucursalXServicio { get; set; }
+        public DbSet<SucursalXTratamiento> SucursalXTratamiento { get; set; }
+        public DbSet<TelefonosSucursal> TelefonosSucursal { get; set; }
+        public DbSet<Tipo_Equipo> Tipo_Equipo { get; set; }
+        public DbSet<Tratamiento> Tratamiento { get; set; }
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            //============== Relaciones 1 a 1 ==============
+            // Empleado(1) con Sucursal(1)
+            modelBuilder.Entity<Sucursal>()
+                .HasOne(s => s.admin)
+                .WithOne(e => e.sucursal)
+                .HasForeignKey<Sucursal>(s => s.id_admin);
+
+            //============== Relaciones 1 a N ==============
+
+            // Empleado(N) con Puesto(1)
+            modelBuilder.Entity<Empleado>()
+                .HasOne(e => e.puesto)
+                .WithMany(p => p.empleados)
+                .HasForeignKey(e => e.id_puesto);
+
+            // Empleado(N) con Sucursal(1)
+            modelBuilder.Entity<Empleado>()
+                .HasOne(e => e.sucursal)
+                .WithMany(s => s.empleados)
+                .HasForeignKey(e => e.id_sucursal);
+
+            // Empleado(N) con Planilla(1)
+            modelBuilder.Entity<Empleado>()
+                .HasOne(e => e.planilla)
+                .WithMany(p => p.empleados)
+                .HasForeignKey(e => e.id_planilla);
+
+            // Clase(N) con Servicio(1)
+            modelBuilder.Entity<Clase>()
+                .HasOne(c => c.servicio)
+                .WithMany(s => s.clases)
+                .HasForeignKey(c => c.id_servicio);
+
+            // Maquina (N) con Tipo_Equipo(1)
+            modelBuilder.Entity<Maquina>()
+                .HasOne(m => m.tipo_equipo)
+                .WithMany(t => t.maquinas)
+                .HasForeignKey(m => m.id_tipo_equipo);
+
+            // Maquina (N) con Sucursal(1)
+            modelBuilder.Entity<Maquina>()
+                .HasOne(m => m.sucursal)
+                .WithMany(s => s.maquinas)
+                .HasForeignKey(m => m.id_sucursal);
+
+            // Clase(N) con Empleado(1)
+            modelBuilder.Entity<Clase>()
+                .HasOne(c => c.instructor)
+                .WithMany(e => e.clases)
+                .HasForeignKey(c => c.id_instructor);
+
+            // Cliente(N) con Empleado(1)
+            modelBuilder.Entity<Cliente>()
+                .HasOne(c => c.instructor)
+                .WithMany(e => e.clientes)
+                .HasForeignKey(c => c.id_instructor);
+
+            // PlanTrabajo(N) con Cliente(1)
+            modelBuilder.Entity<PlanTrabajo>()
+                .HasOne(pt => pt.cliente)
+                .WithMany(c => c.planTrabajos)
+                .HasForeignKey(pt => pt.id_cliente);
+
+            // DetallePlan(N) con PlanTrabajo(1)
+            modelBuilder.Entity<DetallePlan>()
+                .HasOne(dp => dp.plan_trabajo)
+                .WithMany(pt => pt.detalles)
+                .HasForeignKey(dp => dp.id_plan_trabajo);
+
+            // TelefonosSucursal(N) con Sucursal(1)
+            modelBuilder.Entity<TelefonosSucursal>()
+                .HasOne(ts => ts.sucursal)
+                .WithMany(s => s.telefonos)
+                .HasForeignKey(ts => ts.id_sucursal);
+
+            // ============== Relaciones N a M ==============
+            // Cliente(N) con Clase(M)
+            modelBuilder.Entity<ClienteXClase>()
+                .HasKey(cc => new { cc.id_cliente, cc.id_clase });
+            modelBuilder.Entity<ClienteXClase>()
+                .HasOne(cc => cc.cliente)
+                .WithMany(c => c.clases)
+                .HasForeignKey(cc => cc.id_cliente);
+            modelBuilder.Entity<ClienteXClase>()
+                .HasOne(cc => cc.clase)
+                .WithMany(c => c.clientes)
+                .HasForeignKey(cc => cc.id_clase);
+
+            // Sucursal(N) con Producto(M)
+            modelBuilder.Entity<SucursalXProducto>()
+                .HasKey(sp => new { sp.id_sucursal, sp.codigo_barra });
+            modelBuilder.Entity<SucursalXProducto>()
+                .HasOne(sp => sp.sucursal)
+                .WithMany(s => s.productos)
+                .HasForeignKey(sp => sp.id_sucursal);
+            modelBuilder.Entity<SucursalXProducto>()
+                .HasOne(sp => sp.producto)
+                .WithMany(p => p.sucursales)
+                .HasForeignKey(sp => sp.codigo_barra);
+
+            // Sucursal(N) con Servicio(M)
+            modelBuilder.Entity<SucursalXServicio>()
+                .HasKey(ss => new { ss.id_sucursal, ss.id_servicio });
+            modelBuilder.Entity<SucursalXServicio>()
+                .HasOne(ss => ss.sucursal)
+                .WithMany(s => s.servicios)
+                .HasForeignKey(ss => ss.id_sucursal);
+            modelBuilder.Entity<SucursalXServicio>()
+                .HasOne(ss => ss.servicio)
+                .WithMany(s => s.sucursales)
+                .HasForeignKey(ss => ss.id_servicio);
+
+            // Sucursal(N) con Tratamiento(M)
+            modelBuilder.Entity<SucursalXTratamiento>()
+                .HasKey(st => new { st.id_sucursal, st.id_tratamiento });
+            modelBuilder.Entity<SucursalXTratamiento>()
+                .HasOne(st => st.sucursal)
+                .WithMany(s => s.tratamientos)
+                .HasForeignKey(st => st.id_sucursal);
+            modelBuilder.Entity<SucursalXTratamiento>()
+                .HasOne(st => st.tratamiento)
+                .WithMany(t => t.sucursales)
+                .HasForeignKey(st => st.id_tratamiento);
+        }
     }
 }

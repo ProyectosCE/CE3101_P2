@@ -1,18 +1,35 @@
-import { View, StyleSheet, Alert } from 'react-native';
-import { useState } from 'react';
+import { View, StyleSheet, Alert, Text, TouchableOpacity } from 'react-native';
+import { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import SwitchToggle from '../components/SwitchToggle';
 import StatusCard from '../components/StatusCard';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
-import { TouchableOpacity, Text } from 'react-native';
 import { Colors } from '../constants/colors';
+import { saveToStorage, getFromStorage, STORAGE_KEYS } from '../utils/storage';
 
 export default function SyncScreen() {
   const navigation = useNavigation();
   const [isAutoSync, setIsAutoSync] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState('');
 
-  const handleManualSync = () => {
+  // Leer estado guardado al iniciar la pantalla
+  useEffect(() => {
+    async function loadStoredData() {
+      const storedAutoSync = await getFromStorage<boolean>(STORAGE_KEYS.AUTO_SYNC);
+      const storedLastSync = await getFromStorage<string>(STORAGE_KEYS.LAST_SYNC);
+      if (storedAutoSync !== null) setIsAutoSync(storedAutoSync);
+      if (storedLastSync) setLastSyncTime(storedLastSync);
+    }
+    loadStoredData();
+  }, []);
+
+  // Guardar cada vez que cambia el switch
+  const handleToggleChange = async (value: boolean) => {
+    setIsAutoSync(value);
+    await saveToStorage(STORAGE_KEYS.AUTO_SYNC, value);
+  };
+
+  const handleManualSync = async () => {
     const now = new Date();
     const formattedTime = now.toLocaleString('es-CR', {
       day: '2-digit',
@@ -22,6 +39,7 @@ export default function SyncScreen() {
       minute: '2-digit',
     });
     setLastSyncTime(formattedTime);
+    await saveToStorage(STORAGE_KEYS.LAST_SYNC, formattedTime);
     Alert.alert('Sincronización completada', `Datos sincronizados correctamente el ${formattedTime}`);
   };
 
@@ -32,7 +50,7 @@ export default function SyncScreen() {
         <SwitchToggle
           label="Sincronización en tiempo real"
           value={isAutoSync}
-          onValueChange={setIsAutoSync}
+          onValueChange={handleToggleChange}
         />
 
         <StatusCard

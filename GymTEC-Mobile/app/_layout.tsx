@@ -1,29 +1,39 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { Drawer } from 'expo-router/drawer';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
-
+export default function Layout() {
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Drawer
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Drawer.Screen name="home" options={{ title: 'Inicio' }} />
+      <Drawer.Screen name="search" options={{ title: 'Buscar Clases' }} />
+      <Drawer.Screen name="sync" options={{ title: 'Sincronizar' }} />
+      <Drawer.Screen name="profile" options={{ title: 'Perfil' }} />
+
+      {/* Rutas protegidas: ocultas y con swipe desactivado */}
+      <Drawer.Screen
+        name="index"
+        options={{
+          drawerItemStyle: { display: 'none' },
+          swipeEnabled: false,
+        }}
+      />
+      <Drawer.Screen
+        name="login"
+        options={{
+          drawerItemStyle: { display: 'none' },
+          swipeEnabled: false,
+        }}
+      />
+      <Drawer.Screen
+        name="register"
+        options={{
+          drawerItemStyle: { display: 'none' },
+          swipeEnabled: false,
+        }}
+      />
+    </Drawer>
   );
 }

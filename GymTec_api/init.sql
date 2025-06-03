@@ -112,7 +112,7 @@ CREATE TABLE Sucursal (
 	horario_atencion VARCHAR(100) NOT NULL,
 	capacidad_max INT NOT NULL,
 	spa_activo BOOLEAN NOT NULL DEFAULT FALSE,
-	tienda_activa BOOLEAN NOT NULL DEFAULT FALSE,
+	tienda_activo BOOLEAN NOT NULL DEFAULT FALSE,
 	distrito VARCHAR(100) NOT NULL,
 	canton VARCHAR(100) NOT NULL,
 	provincia VARCHAR(100) NOT NULL,

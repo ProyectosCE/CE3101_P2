@@ -50,5 +50,8 @@ namespace GymTec_api.Models
 
         [JsonIgnore]
         public ICollection<Cliente>? clientes { get; set; } = new List<Cliente>();
+
+        [InverseProperty("admin")]
+        public Sucursal? sucursalQueAdministra { get; set; }
     }
 }

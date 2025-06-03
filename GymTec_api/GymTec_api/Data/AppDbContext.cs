@@ -9,24 +9,24 @@ namespace GymTec_api.Data
         {
         }
         // DbSets para los modelos
-        public DbSet<Clase> Clase { get; set; }
-        public DbSet<Cliente> Cliente { get; set; }
-        public DbSet<ClienteXClase> ClienteXClase { get; set; }
+        public DbSet<Clase> clase { get; set; }
+        public DbSet<Cliente> cliente { get; set; }
+        public DbSet<ClienteXClase> clienteXClase { get; set; }
         public DbSet<DetallePlan> detallePlan { get; set; }
-        public DbSet<Empleado> Empleado { get; set; }
-        public DbSet<Maquina> Maquina { get; set; }
-        public DbSet<Planilla> Planilla { get; set; }
-        public DbSet<PlanTrabajo> PlanTrabajo { get; set; }
-        public DbSet<Producto> Producto { get; set; }
-        public DbSet<Puesto> Puesto { get; set; }
-        public DbSet<Servicio> Servicio { get; set; }
-        public DbSet<Sucursal> Sucursal { get; set; }
-        public DbSet<SucursalXProducto> SucursalXProducto { get; set; }
-        public DbSet<SucursalXServicio> SucursalXServicio { get; set; }
-        public DbSet<SucursalXTratamiento> SucursalXTratamiento { get; set; }
-        public DbSet<TelefonosSucursal> TelefonosSucursal { get; set; }
-        public DbSet<Tipo_Equipo> Tipo_Equipo { get; set; }
-        public DbSet<Tratamiento> Tratamiento { get; set; }
+        public DbSet<Empleado> empleado { get; set; }
+        public DbSet<Maquina> maquina { get; set; }
+        public DbSet<Planilla> planilla { get; set; }
+        public DbSet<PlanTrabajo> plantrabajo { get; set; }
+        public DbSet<Producto> producto { get; set; }
+        public DbSet<Puesto> puesto { get; set; }
+        public DbSet<Servicio> servicio { get; set; }
+        public DbSet<Sucursal> sucursal { get; set; }
+        public DbSet<SucursalXProducto> sucursalxproducto { get; set; }
+        public DbSet<SucursalXServicio> sucursalxservicio { get; set; }
+        public DbSet<SucursalXTratamiento> sucursalxtratamiento { get; set; }
+        public DbSet<TelefonosSucursal> telefonossucursal { get; set; }
+        public DbSet<Tipo_Equipo> tipo_equipo { get; set; }
+        public DbSet<Tratamiento> tratamiento { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,8 +37,10 @@ namespace GymTec_api.Data
             // Empleado(1) con Sucursal(1)
             modelBuilder.Entity<Sucursal>()
                 .HasOne(s => s.admin)
-                .WithOne(e => e.sucursal)
-                .HasForeignKey<Sucursal>(s => s.id_admin);
+                .WithOne(e => e.sucursalQueAdministra)
+                .HasForeignKey<Sucursal>(s => s.id_admin)
+                .IsRequired(); 
+
 
             //============== Relaciones 1 a N ==============
 

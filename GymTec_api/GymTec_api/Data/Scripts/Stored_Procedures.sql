@@ -189,4 +189,44 @@ BEGIN
 END;
 $$;
 
+-- Eliminar PlanTrabajo
+CREATE OR REPLACE PROCEDURE eliminar_plan_trabajo(plan_id INT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Eliminar detalles asociados al plan
+    DELETE FROM detalleplan
+    WHERE id_plan_trabajo = plan_id;
+
+    -- Eliminar el plan de trabajo
+    DELETE FROM plantrabajo
+    WHERE id_plan_trabajo = plan_id;
+END;
+$$;
+
+
+-- Eliminar Clientes
+CREATE OR REPLACE PROCEDURE eliminar_cliente(cliente_id INT)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    plan RECORD;
+BEGIN
+    -- Eliminar registros en clientesxclase asociados al cliente
+    DELETE FROM clientesxclase
+    WHERE id_cliente = cliente_id;
+
+    -- Para cada plan de trabajo asociado al cliente, llamar a eliminar_plan_trabajo
+    FOR plan IN
+        SELECT id_plan_trabajo FROM plantrabajo WHERE id_cliente = cliente_id
+    LOOP
+        CALL eliminar_plan_trabajo(plan.id_plan_trabajo);
+    END LOOP;
+
+    -- Eliminar el cliente
+    DELETE FROM cliente
+    WHERE id_cliente = cliente_id;
+END;
+$$;
+
 

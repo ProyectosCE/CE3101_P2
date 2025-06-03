@@ -115,6 +115,7 @@ namespace GymTec_api.Controllers
 
             return Ok(new
             {
+                succes = true,
                 mensaje = "Contraseñas migradas correctamente",
                 clientesActualizados,
                 empleadosActualizados

@@ -21,34 +21,46 @@ namespace GymTec_api.Controllers
         [HttpGet("api/sucursal")]
         public IActionResult GetSucursales()
         {
-            var sucursales = _context.sucursal.ToList();
-            return Ok(sucursales);
+            try
+            {
+                var sucursales = _context.sucursal.ToList();
+                return Ok(new { success = true, data = sucursales });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
         }
 
-        // POST: api/sucursal   
+        // POST: api/sucursal
         [HttpPost("api/sucursal")]
         public IActionResult CreateSucursal([FromBody] Sucursal nuevaSucursal)
         {
             if (nuevaSucursal == null)
             {
-                return BadRequest("Sucursal no puede ser nula.");
+                return BadRequest(new { success = false, error = "Sucursal no puede ser nula." });
             }
+
             _context.sucursal.Add(nuevaSucursal);
             try
             {
                 _context.SaveChanges();
+                return Ok(new
+                {
+                    success = true,
+                    mensaje = "Sucursal creada correctamente.",
+                    data = nuevaSucursal
+                });
             }
             catch (DbUpdateException dbEx)
             {
                 // Si es una violación lanzada desde el trigger
-                return BadRequest($"Error en la base de datos: {dbEx.InnerException?.Message ?? dbEx.Message}");
+                return BadRequest(new { success = false, error = dbEx.InnerException?.Message ?? dbEx.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error inesperado: {ex.Message}");
+                return StatusCode(500, new { success = false, error = ex.Message });
             }
-
-            return CreatedAtAction(nameof(GetSucursales), new { id = nuevaSucursal.id_sucursal }, nuevaSucursal);
         }
 
         // PATCH: api/sucursal/{id_sucursal}
@@ -57,14 +69,16 @@ namespace GymTec_api.Controllers
         {
             if (sucursalActualizada == null || id_sucursal != sucursalActualizada.id_sucursal)
             {
-                return BadRequest("Datos de la sucursal no válidos.");
+                return BadRequest(new { success = false, error = "Datos de la sucursal no válidos." });
             }
+
             var sucursalExistente = _context.sucursal.Find(id_sucursal);
             if (sucursalExistente == null)
             {
-                return NotFound("Sucursal no encontrada.");
+                return NotFound(new { success = false, error = "Sucursal no encontrada." });
             }
-            // Actualizar los campos necesarios
+
+            // Actualizar campos
             sucursalExistente.nombre_sucursal = sucursalActualizada.nombre_sucursal;
             sucursalExistente.id_admin = sucursalActualizada.id_admin;
             sucursalExistente.horario_atencion = sucursalActualizada.horario_atencion;
@@ -72,21 +86,21 @@ namespace GymTec_api.Controllers
             sucursalExistente.distrito = sucursalActualizada.distrito;
             sucursalExistente.canton = sucursalActualizada.canton;
             sucursalExistente.provincia = sucursalActualizada.provincia;
+
             try
             {
                 _context.SaveChanges();
+                return Ok(new { success = true, mensaje = "Sucursal actualizada correctamente." });
             }
             catch (DbUpdateException dbEx)
             {
                 // Si es una violación lanzada desde el trigger
-                return BadRequest($"Error en la base de datos: {dbEx.InnerException?.Message ?? dbEx.Message}");
+                return BadRequest(new { success = false, error = dbEx.InnerException?.Message ?? dbEx.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error inesperado: {ex.Message}");
+                return StatusCode(500, new { success = false, error = ex.Message });
             }
-
-            return NoContent();
         }
 
         // PATCH: api/sucursal/spa_toggle/{id_sucursal}
@@ -96,13 +110,20 @@ namespace GymTec_api.Controllers
             var sucursal = _context.sucursal.Find(id_sucursal);
             if (sucursal == null)
             {
-                return NotFound("Sucursal no encontrada.");
+                return NotFound(new { success = false, error = "Sucursal no encontrada." });
             }
+
             sucursal.spa_activo = !sucursal.spa_activo;
             _context.SaveChanges();
 
-            return Ok(sucursal);
+            return Ok(new
+            {
+                success = true,
+                mensaje = "Estado de spa actualizado correctamente.",
+                data = sucursal
+            });
         }
+
 
         // PATCH: api/sucursal/tienda_toggle/{id_sucursal}
         [HttpPatch("api/sucursal/tienda_toggle/{id_sucursal}")]
@@ -111,27 +132,32 @@ namespace GymTec_api.Controllers
             var sucursal = _context.sucursal.Find(id_sucursal);
             if (sucursal == null)
             {
-                return NotFound("Sucursal no encontrada.");
+                return NotFound(new { success = false, error = "Sucursal no encontrada." });
             }
+
             sucursal.tienda_activo = !sucursal.tienda_activo;
             _context.SaveChanges();
 
-            return Ok(sucursal);
+            return Ok(new
+            {
+                success = true,
+                mensaje = "Estado de tienda actualizado correctamente.",
+                data = sucursal
+            });
         }
 
-        // DELETE: api/sucursal/{id_sucursal}   
+        // DELETE: api/sucursal/{id_sucursal}
         [HttpDelete("api/sucursal/{id_sucursal}")]
         public IActionResult Delete(int id_sucursal)
         {
             try
             {
-                // STORED PROCEDURE
                 _context.Database.ExecuteSqlRaw("CALL eliminar_sucursal_completa({0})", id_sucursal);
-                return NoContent(); 
+                return Ok(new { success = true, mensaje = "Sucursal eliminada correctamente." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = ex.Message });
+                return StatusCode(500, new { success = false, error = ex.Message });
             }
         }
 
@@ -141,7 +167,6 @@ namespace GymTec_api.Controllers
         {
             try
             {
-                // Ejecutar la función y obtener el nuevo id_sucursal
                 var newIdSucursal = _context
                     .sucursal
                     .FromSqlRaw("SELECT copiar_sucursal({0}) AS id_sucursal", id_sucursal)
@@ -150,7 +175,7 @@ namespace GymTec_api.Controllers
 
                 if (newIdSucursal == 0)
                 {
-                    return NotFound(new { message = "Sucursal original no encontrada o no pudo copiarse." });
+                    return NotFound(new { success = false, error = "Sucursal original no encontrada o no pudo copiarse." });
                 }
 
                 return Ok(new

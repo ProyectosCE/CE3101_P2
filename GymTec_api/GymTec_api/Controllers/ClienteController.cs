@@ -19,8 +19,15 @@ namespace GymTec_api.Controllers
         [HttpGet]
         public IActionResult GetClientes()
         {
-            var clientes = _context.cliente.ToList();
-            return Ok(clientes);
+            try
+            {
+                var clientes = _context.cliente.ToList();
+                return Ok(new { success = true, data = clientes });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
         }
 
         // POST: api/cliente
@@ -29,15 +36,31 @@ namespace GymTec_api.Controllers
         {
             if (cliente == null)
             {
-                return BadRequest("Cliente no puede ser nulo");
+                return BadRequest(new { success = false, error = "Cliente no puede ser nulo" });
             }
 
             // Encriptar contraseña
             cliente.password = BCrypt.Net.BCrypt.HashPassword(cliente.password);
 
             _context.cliente.Add(cliente);
-            _context.SaveChanges();
-            return CreatedAtAction(nameof(GetClientes), new { id = cliente.id_cliente }, cliente);
+            try
+            {
+                _context.SaveChanges();
+                return Ok(new
+                {
+                    success = true,
+                    mensaje = "Cliente creado correctamente.",
+                    data = cliente
+                });
+            }
+            catch (DbUpdateException dbEx)
+            {
+                return BadRequest(new { success = false, error = dbEx.InnerException?.Message ?? dbEx.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
         }
 
         // PATCH: api/cliente/{id_cliente}
@@ -46,18 +69,20 @@ namespace GymTec_api.Controllers
         {
             if (cliente == null || id_cliente != cliente.id_cliente)
             {
-                return BadRequest("Datos del cliente no válidos");
+                return BadRequest(new { success = false, error = "Datos del cliente no válidos" });
             }
+
             var existingCliente = _context.cliente.Find(id_cliente);
             if (existingCliente == null)
             {
-                return NotFound("Cliente no encontrado");
+                return NotFound(new { success = false, error = "Cliente no encontrado" });
             }
+
             existingCliente.cedula = cliente.cedula;
             existingCliente.peso = cliente.peso;
             existingCliente.imc = cliente.imc;
             existingCliente.correo = cliente.correo;
-            existingCliente.password = cliente.password;
+            existingCliente.password = cliente.password; // Si deseas, aquí podrías encriptar la password si cambia
             existingCliente.nombres = cliente.nombres;
             existingCliente.apellidos = cliente.apellidos;
             existingCliente.fecha_nacimiento = cliente.fecha_nacimiento;
@@ -69,32 +94,32 @@ namespace GymTec_api.Controllers
             try
             {
                 _context.SaveChanges();
+                return Ok(new { success = true, mensaje = "Cliente actualizado correctamente." });
             }
             catch (DbUpdateException dbEx)
             {
-                // Si es una violación lanzada desde el trigger
-                return BadRequest($"Error en la base de datos: {dbEx.InnerException?.Message ?? dbEx.Message}");
+                return BadRequest(new { success = false, error = dbEx.InnerException?.Message ?? dbEx.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error inesperado: {ex.Message}");
+                return StatusCode(500, new { success = false, error = ex.Message });
             }
-
-            return NoContent();
         }
+
 
         // DELETE: api/cliente/{id_cliente}
         [HttpDelete("{id_cliente}")]
         public IActionResult DeleteCliente(int id_cliente)
         {
-            var cliente = _context.cliente.Find(id_cliente);
-            if (cliente == null)
+            try
             {
-                return NotFound("Cliente no encontrado");
+                _context.Database.ExecuteSqlRaw("CALL eliminar_cliente({0})", id_cliente);
+                return Ok(new { success = true, mensaje = "Cliente eliminado correctamente." });
             }
-            _context.cliente.Remove(cliente);
-            _context.SaveChanges();
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
         }
     }
 }

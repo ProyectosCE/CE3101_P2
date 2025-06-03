@@ -2,6 +2,7 @@
 using GymTec_api.Models;
 using GymTec_api.Models.Vistas;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GymTec_api.Controllers
 {
@@ -19,8 +20,15 @@ namespace GymTec_api.Controllers
         [HttpGet]
         public IActionResult GetClases()
         {
-            var clases = _context.clase.ToList();
-            return Ok(clases);
+            try
+            {
+                var clases = _context.clase.ToList();
+                return Ok(new { success = true, data = clases });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
         }
 
         // POST: api/clase
@@ -29,11 +37,28 @@ namespace GymTec_api.Controllers
         {
             if (nuevaClase == null)
             {
-                return BadRequest("Clase no puede ser nula.");
+                return BadRequest(new { success = false, error = "Clase no puede ser nula." });
             }
+
             _context.clase.Add(nuevaClase);
-            _context.SaveChanges();
-            return CreatedAtAction(nameof(GetClases), new { id = nuevaClase.id_clase }, nuevaClase);
+            try
+            {
+                _context.SaveChanges();
+                return Ok(new
+                {
+                    success = true,
+                    mensaje = "Clase creada correctamente.",
+                    data = nuevaClase
+                });
+            }
+            catch (DbUpdateException dbEx)
+            {
+                return BadRequest(new { success = false, error = dbEx.InnerException?.Message ?? dbEx.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
         }
 
         // PATCH : api/clase/{id_clase}
@@ -42,14 +67,16 @@ namespace GymTec_api.Controllers
         {
             if (claseActualizada == null || id_clase != claseActualizada.id_clase)
             {
-                return BadRequest("Datos de clase no válidos.");
+                return BadRequest(new { success = false, error = "Datos de clase no válidos." });
             }
+
             var claseExistente = _context.clase.Find(id_clase);
             if (claseExistente == null)
             {
-                return NotFound("Clase no encontrada.");
+                return NotFound(new { success = false, error = "Clase no encontrada." });
             }
-            // Actualizar los campos necesarios
+
+            // Actualizar campos
             claseExistente.hora_inicio = claseActualizada.hora_inicio;
             claseExistente.hora_fin = claseActualizada.hora_fin;
             claseExistente.grupal = claseActualizada.grupal;
@@ -57,34 +84,62 @@ namespace GymTec_api.Controllers
             claseExistente.fecha = claseActualizada.fecha;
             claseExistente.id_servicio = claseActualizada.id_servicio;
             claseExistente.id_instructor = claseActualizada.id_instructor;
-            _context.SaveChanges();
-            return NoContent();
+
+            try
+            {
+                _context.SaveChanges();
+                return Ok(new { success = true, mensaje = "Clase actualizada correctamente." });
+            }
+            catch (DbUpdateException dbEx)
+            {
+                return BadRequest(new { success = false, error = dbEx.InnerException?.Message ?? dbEx.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
         }
 
         // DELETE: api/clase/{id_clase}
         [HttpDelete("{id_clase}")]
         public IActionResult DeleteClase(int id_clase)
         {
-            var clase = _context.clase.Find(id_clase);
-            if (clase == null)
+            try
             {
-                return NotFound("Clase no encontrada.");
+                _context.Database.ExecuteSqlRaw("CALL eliminar_clase({0})", id_clase);
+                return Ok(new
+                {
+                    success = true,
+                    mensaje = "Clase eliminado correctamente."
+                });
             }
-            _context.clase.Remove(clase);
-            _context.SaveChanges();
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    error = ex.Message
+                });
+            }
         }
 
-        //GET: api/clase/clases_disponibles
+        // GET: api/clase/clases_disponibles
         [HttpGet("clases_disponibles")]
-        public ActionResult<IEnumerable<ClaseDisponible>> GetClasesDisponibles()
+        public IActionResult GetClasesDisponibles()
         {
-            var clasesDisponibles = _context.clases_disponibles.ToList();
-            if (clasesDisponibles == null || !clasesDisponibles.Any())
+            try
             {
-                return NotFound("No hay clases disponibles.");
+                var clasesDisponibles = _context.clases_disponibles.ToList();
+                if (clasesDisponibles == null || !clasesDisponibles.Any())
+                {
+                    return NotFound(new { success = false, error = "No hay clases disponibles." });
+                }
+                return Ok(new { success = true, data = clasesDisponibles });
             }
-            return Ok(clasesDisponibles);
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
         }
 
     }

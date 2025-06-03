@@ -1,38 +1,9 @@
 
--- Eliminar sucursal
-CREATE OR REPLACE PROCEDURE eliminar_sucursal_completa(p_id_sucursal INT)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    -- 1. Eliminar relaciones auxiliares
-    DELETE FROM telefonossucursal WHERE id_sucursal = p_id_sucursal;
-    DELETE FROM sucursalxtratamiento WHERE id_sucursal = p_id_sucursal;
-    DELETE FROM sucursalxproducto WHERE id_sucursal = p_id_sucursal;
-    DELETE FROM sucursalxservicio WHERE id_sucursal = p_id_sucursal;
-
-    -- 2. Eliminar registros clientexclase de clases de esa sucursal
-    DELETE FROM clientexclase
-    WHERE id_clase IN (
-        SELECT id_clase FROM clase WHERE id_sucursal = p_id_sucursal
-    );
-
-    -- 3. Eliminar clases asociadas a esa sucursal
-    DELETE FROM clase WHERE id_sucursal = p_id_sucursal;
-
-    -- 4. Poner NULL en id_sucursal de empleados
-    UPDATE empleado
-    SET id_sucursal = NULL
-    WHERE id_sucursal = p_id_sucursal;
-
-    -- 5. Poner NULL en maquinas
-    UPDATE maquina
-    SET id_sucursal = NULL
-    WHERE id_sucursal = p_id_sucursal;
-
-    -- 6. Eliminar la sucursal
-    DELETE FROM sucursal WHERE id_sucursal = p_id_sucursal;
-END;
-$$;
+/*
+    =========================================================
+                          COPIAR DATOS
+    =========================================================
+*/
 
 -- Copiar un sucursal
 CREATE OR REPLACE FUNCTION copiar_sucursal(p_id_sucursal INT)
@@ -95,5 +66,127 @@ BEGIN
 END;
 $$;
 
+
+/*
+    =========================================================
+                       ELIMINACION DE DATOS
+    =========================================================
+*/
+
+-- Eliminar sucursal
+CREATE OR REPLACE PROCEDURE eliminar_sucursal_completa(p_id_sucursal INT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- 1. Eliminar relaciones auxiliares
+    DELETE FROM telefonossucursal WHERE id_sucursal = p_id_sucursal;
+    DELETE FROM sucursalxtratamiento WHERE id_sucursal = p_id_sucursal;
+    DELETE FROM sucursalxproducto WHERE id_sucursal = p_id_sucursal;
+    DELETE FROM sucursalxservicio WHERE id_sucursal = p_id_sucursal;
+
+    -- 2. Eliminar registros clientexclase de clases de esa sucursal
+    DELETE FROM clientexclase
+    WHERE id_clase IN (
+        SELECT id_clase FROM clase WHERE id_sucursal = p_id_sucursal
+    );
+
+    -- 3. Eliminar clases asociadas a esa sucursal
+    DELETE FROM clase WHERE id_sucursal = p_id_sucursal;
+
+    -- 4. Poner NULL en id_sucursal de empleados
+    UPDATE empleado
+    SET id_sucursal = NULL
+    WHERE id_sucursal = p_id_sucursal;
+
+    -- 5. Poner NULL en maquinas
+    UPDATE maquina
+    SET id_sucursal = NULL
+    WHERE id_sucursal = p_id_sucursal;
+
+    -- 6. Eliminar la sucursal
+    DELETE FROM sucursal WHERE id_sucursal = p_id_sucursal;
+END;
+$$;
+
+-- Eliminar tratamiento
+CREATE OR REPLACE PROCEDURE eliminar_tratamiento(tratamiento_id INT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Eliminar relaciones en sucursalxtratamiento
+    DELETE FROM sucursalxtratamiento
+    WHERE id_tratamiento = tratamiento_id;
+
+    -- Eliminar tratamiento en tabla tratamiento
+    DELETE FROM tratamiento
+    WHERE id_tratamiento = tratamiento_id;
+END;
+$$;
+
+-- Eliminar productos
+CREATE OR REPLACE PROCEDURE eliminar_producto(codigo_barra TEXT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Eliminar relaciones en sucursalxproducto
+    DELETE FROM sucursalxproducto
+    WHERE codigo_barra = codigo_barra;
+
+    -- Eliminar producto en tabla producto
+    DELETE FROM producto
+    WHERE codigo_barra = codigo_barra;
+END;
+$$;
+
+-- Eliminar puestos
+CREATE OR REPLACE PROCEDURE eliminar_puesto(puesto_id INT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Eliminar relaciones en empleado
+    DELETE FROM empleado
+    WHERE id_puesto = puesto_id;
+
+    -- Eliminar puesto en tabla puesto
+    DELETE FROM puesto
+    WHERE id_puesto = puesto_id;
+END;
+$$;
+
+-- Eliminar clases
+CREATE OR REPLACE PROCEDURE eliminar_clase(clase_id INT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Eliminar relaciones en clientexclase
+    DELETE FROM clientexclase
+    WHERE id_clase = clase_id;
+
+    -- Eliminar la clase de la tabla clase
+    DELETE FROM clase
+    WHERE id_clase = clase_id;
+END;
+$$;
+
+-- Eliminar servicios
+CREATE OR REPLACE PROCEDURE eliminar_servicio(servicio_id INT)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    clase_id_actual INT;
+BEGIN
+    FOR clase_id_actual IN
+        SELECT id_clase FROM clase WHERE id_servicio = servicio_id
+    LOOP
+        CALL eliminar_clase(clase_id_actual); 
+    END LOOP;
+
+    DELETE FROM sucursalxservicio 
+    WHERE id_servicio = servicio_id;
+
+    DELETE FROM servicio 
+    WHERE id_servicio = servicio_id;
+END;
+$$;
 
 

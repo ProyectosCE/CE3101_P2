@@ -213,7 +213,7 @@ DECLARE
     plan RECORD;
 BEGIN
     -- Eliminar registros en clientesxclase asociados al cliente
-    DELETE FROM clientesxclase
+    DELETE FROM clientexclase
     WHERE id_cliente = cliente_id;
 
     -- Para cada plan de trabajo asociado al cliente, llamar a eliminar_plan_trabajo

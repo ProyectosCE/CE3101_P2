@@ -18,7 +18,7 @@ namespace GymTec_api.Models
         [ForeignKey("id_tipo_equipo")]
         public Tipo_Equipo? tipo_equipo { get; set; }
 
-        public int? id_sucursal { get; set; }
+        public int? id_sucursal { get; set; } // Puede ser null
         [ForeignKey("id_sucursal")]
         public Sucursal? sucursal { get; set; }
 

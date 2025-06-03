@@ -9,6 +9,7 @@ namespace GymTec_api.Models
         [Key]
         public int id_servicio { get; set; }
         public string descripcion { get; set; }
+        public bool is_default { get; set; } = false;
 
         // Navegacion
         [JsonIgnore]

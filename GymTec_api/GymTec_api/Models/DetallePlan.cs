@@ -9,7 +9,7 @@ namespace GymTec_api.Models
         // Atributos
         [Key]
         public int id_detalle_plan { get; set; }
-        public DateOnly date { get; set; }
+        public DateOnly fecha { get; set; }
         public string actividad { get; set; }
 
         // Fks

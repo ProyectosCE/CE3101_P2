@@ -146,9 +146,9 @@ UPDATE cliente SET id_instructor = 1 WHERE cedula = '111111111'; -- Cliente 1 as
 UPDATE cliente SET id_instructor = 2 WHERE cedula = '222222222'; -- Cliente 2 asignado al instructor 2
 
 -- plantrabajo
-INSERT INTO plantrabajo (id_cliente, id_instructor, id_sucursal, fecha_inicio, fecha_fin, descripcion) VALUES
-(1, 1, 1, '2023-10-01', '2023-10-31', 'Plan de entrenamiento personalizado para Cliente 1'),
-(2, 2, 1, '2023-10-01', '2023-10-31', 'Plan de entrenamiento personalizado para Cliente 2');
+INSERT INTO plantrabajo (id_cliente, start_date, end_date, descripcion) VALUES
+(1, '2023-10-01', '2023-10-31', 'Plan de entrenamiento personalizado para Cliente 1'),
+(2, '2023-10-01', '2023-10-31', 'Plan de entrenamiento personalizado para Cliente 2');
 
 -- DetallePlan
 INSERT INTO detalleplan (id_plan_trabajo, fecha, actividad) VALUES

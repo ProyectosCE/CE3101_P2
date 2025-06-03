@@ -1,6 +1,7 @@
 ﻿using GymTec_api.Data;
 using GymTec_api.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GymTec_api.Controllers
 {
@@ -59,7 +60,22 @@ namespace GymTec_api.Controllers
             existingCliente.distrito = cliente.distrito;
             existingCliente.canton = cliente.canton;
             existingCliente.provincia = cliente.provincia;
-            _context.SaveChanges();
+            existingCliente.id_instructor = cliente.id_instructor;
+
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch (DbUpdateException dbEx)
+            {
+                // Si es una violación lanzada desde el trigger
+                return BadRequest($"Error en la base de datos: {dbEx.InnerException?.Message ?? dbEx.Message}");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error inesperado: {ex.Message}");
+            }
+
             return NoContent();
         }
 

@@ -24,7 +24,7 @@ namespace GymTec_api.Models
         public string direccion => $"{provincia}, {canton}, {distrito}";
 
         // Fks
-        public int id_admin { get; set; }
+        public int? id_admin { get; set; }
         [ForeignKey("id_admin")]
         public Empleado? admin { get; set; }
 
@@ -46,5 +46,7 @@ namespace GymTec_api.Models
         [JsonIgnore]
         public ICollection<SucursalXTratamiento> tratamientos { get; set; } = new List<SucursalXTratamiento>();
 
+        [JsonIgnore]
+        public ICollection<Clase>? clases { get; set; } = new List<Clase>();
     }
 }

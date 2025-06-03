@@ -20,9 +20,13 @@ namespace GymTec_api.Models
         [ForeignKey("id_servicio")]
         public Servicio? servicio { get; set; }
 
-        public int id_instructor { get; set; }
+        public int? id_instructor { get; set; }
         [ForeignKey("id_instructor")]
         public Empleado? instructor { get; set; }
+
+        public int id_sucursal { get; set; }
+        [ForeignKey("id_sucursal")]
+        public Sucursal? sucursal { get; set; }
 
 
         // Navegacion

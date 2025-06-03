@@ -124,11 +124,11 @@ INSERT INTO telefonossucursal (numero_telefono, id_sucursal) VALUES
 ('33333333', 2); -- Sucursal Secundaria
 
 -- Clase
-INSERT INTO clase (hora_inicio, hora_fin, grupal, capacidad, fecha, id_instructor, id_servicio) VALUES
-('08:00:00', '09:00:00', FALSE, 20, '2023-10-01', 1, 1), -- Clase de Indoor Cycling
-('10:00:00', '11:00:00', TRUE, 15, '2023-10-01', 2, 2), -- Clase de Pilates
-('12:00:00', '13:00:00', TRUE, 25, '2023-10-01', 1, 3), -- Clase de Yoga
-('14:00:00', '15:00:00', TRUE, 30, '2023-10-01', 2, 4); -- Clase de Zumba
+INSERT INTO clase (hora_inicio, hora_fin, grupal, capacidad, fecha, id_instructor, id_servicio, id_sucursal) VALUES
+('08:00:00', '09:00:00', FALSE, 20, '2023-10-01', 3, 1, 1), -- Clase de Indoor Cycling
+('10:00:00', '11:00:00', TRUE, 15, '2023-10-01', 5, 2, 2), -- Clase de Pilates
+('12:00:00', '13:00:00', TRUE, 25, '2023-10-01', 3, 3, 1), -- Clase de Yoga
+('14:00:00', '15:00:00', TRUE, 30, '2023-10-01', 5, 4, 2); -- Clase de Zumba
 
 -- clientexclase
 INSERT INTO clientexclase (id_cliente, id_clase) VALUES
@@ -142,8 +142,8 @@ INSERT INTO clientexclase (id_cliente, id_clase) VALUES
 
 
 -- Asignar instructor a clientes
-UPDATE cliente SET id_instructor = 1 WHERE cedula = '111111111'; -- Cliente 1 asignado al instructor 1
-UPDATE cliente SET id_instructor = 2 WHERE cedula = '222222222'; -- Cliente 2 asignado al instructor 2
+UPDATE cliente SET id_instructor = 3 WHERE cedula = '111111111'; -- Cliente 1 asignado al instructor 3
+UPDATE cliente SET id_instructor = 5 WHERE cedula = '222222222'; -- Cliente 2 asignado al instructor 5
 
 -- plantrabajo
 INSERT INTO plantrabajo (id_cliente, start_date, end_date, descripcion) VALUES
@@ -164,3 +164,66 @@ INSERT INTO maquina (marca, num_serie, costo, id_tipo_equipo, id_sucursal) VALUE
 ('Marca B', 'MAQ002', 600000.00, 2, 1),
 ('Marca C', 'MAQ003', 700000.00, 3, 2),
 ('Marca D', 'MAQ004', 800000.00, 4, 2);
+
+-- ===============Sucursal para eliminar===================
+
+INSERT INTO empleado (cedula, salario, correo, password, clases_horas, nombres, apellidos, distrito, canton, provincia, id_planilla, id_puesto) VALUES
+('707070707', 800000.00, 'admin3@gym.com', 'adminpass', 0, 'Alberto', 'Chinchilla', 'Santa Ana', 'San José', 'San José', 1, 1);
+
+
+-- Surcursal
+INSERT INTO sucursal (nombre_sucursal, fecha_apertura, horario_atencion, capacidad_max, distrito, canton, provincia, id_admin) 
+VALUES 
+('Sucursal prueba', '2022-01-01', '06:00 - 22:00', 100, 'San Francisco', 'Heredia', 'Heredia', 7);
+
+UPDATE empleado SET id_sucursal = 3 WHERE cedula = '707070707'; -- Asignar admin a la sucursal
+
+-- Empleado (Instructor)
+INSERT INTO empleado (cedula, salario, correo, password, clases_horas, nombres, apellidos, distrito, canton, provincia, id_planilla, id_puesto, id_sucursal) VALUES
+('808080808', 500000.00, 'instructor8@gym.com', 'instpass', 20, 'inst8', 'Lopez', 'Hatillo', 'San José', 'San José', 2, 2, 3), -- Instructor
+('909090909', 600000.00, 'isntructor9@gym.com', 'instpass', 4, 'inst9', 'Fernandez', 'Oriental', 'Cartago', 'Cartago', 3, 2, 3);  --Instructor
+
+-- SucursalXServicio
+INSERT INTO sucursalxservicio (id_sucursal, id_servicio) VALUES
+(3, 1), -- Sucursal Central ofrece Indoor Cycling
+(3, 2), -- Sucursal Central ofrece Pilates
+(3, 3), -- Sucursal Central ofrece Yoga
+(3, 4), -- Sucursal Central ofrece Zumba
+(3, 5), -- Sucursal Central ofrece Natación
+(3, 6); -- Sucursal Central ofrece Tienda de suplementos
+
+-- SucursalXTratamiento
+INSERT INTO sucursalxtratamiento (id_sucursal, id_tratamiento) VALUES
+(3, 1), -- Sucursal Central ofrece Masaje relajante
+(3, 2), -- Sucursal Central ofrece Masaje descarga muscular
+(3, 3), -- Sucursal Central ofrece Sauna
+(3, 4); -- Sucursal Central ofrece Baños a vapor
+
+-- SucursalXProducto
+INSERT INTO sucursalxproducto (id_sucursal, codigo_barra) VALUES
+(3, 'PROD001'), -- Sucursal Central ofrece Proteína en polvo
+(3, 'PROD002'), -- Sucursal Central ofrece Creatina
+(3, 'PROD003'), -- Sucursal Central ofrece Aminoácidos
+(3, 'PROD004'); -- Sucursal Central ofrece Barras energéticas
+
+
+-- TelefonsSucursal
+INSERT INTO telefonossucursal (numero_telefono, id_sucursal) VALUES
+('333333333', 3);
+
+-- Clase
+INSERT INTO clase (hora_inicio, hora_fin, grupal, capacidad, fecha, id_instructor, id_servicio, id_sucursal) VALUES
+('08:00:00', '09:00:00', FALSE, 20, '2023-10-01', 8, 1, 3), -- Clase de Indoor Cycling
+('10:00:00', '11:00:00', TRUE, 15, '2023-10-01', 8, 2, 3), -- Clase de Pilates
+('12:00:00', '13:00:00', TRUE, 25, '2023-10-01', 9, 3, 3), -- Clase de Yoga
+('14:00:00', '15:00:00', TRUE, 30, '2023-10-01', 9, 4, 3); -- Clase de Zumba
+
+-- clientexclase
+INSERT INTO clientexclase (id_cliente, id_clase) VALUES
+(1, 5), -- Cliente 1 inscrito en Clase de Indoor Cycling
+(2, 6), -- Cliente 2 inscrito en Clase de Pilates
+(3, 7), -- Cliente 3 inscrito en Clase de Yoga
+(4, 8), -- Cliente 4 inscrito en Clase de Zumba
+(5, 5), -- Cliente 5 inscrito en Clase de Indoor Cycling 
+(5, 6), -- Cliente 5 inscrito en Clase de Indoor Pilates
+(6, 7); -- Cliente 6 inscrito en Clase de Yoga

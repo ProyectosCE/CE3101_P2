@@ -9,8 +9,9 @@ CREATE TABLE clase (
 	capacidad INT NOT NULL,
 	fecha DATE NOT NULL,
 	--Fks
-	id_instructor INT NOT NULL,
-	id_servicio INT NOT NULL
+	id_instructor INT,
+	id_servicio INT NOT NULL,
+	id_sucursal INT NOT NULL
 );
 
 CREATE TABLE cliente (
@@ -109,14 +110,14 @@ CREATE TABLE servicio (
 CREATE TABLE sucursal (
 	id_sucursal SERIAL PRIMARY KEY,
 	nombre_sucursal VARCHAR(100) NOT NULL UNIQUE,
-	fecha_apertura DATE NOT NULL, 
-	horario_atencion VARCHAR(100) NOT NULL,
-	capacidad_max INT NOT NULL,
+	fecha_apertura DATE, 
+	horario_atencion VARCHAR(100),
+	capacidad_max INT,
 	spa_activo BOOLEAN NOT NULL DEFAULT FALSE,
 	tienda_activo BOOLEAN NOT NULL DEFAULT FALSE,
-	distrito VARCHAR(100) NOT NULL,
-	canton VARCHAR(100) NOT NULL,
-	provincia VARCHAR(100) NOT NULL,
+	distrito VARCHAR(100),
+	canton VARCHAR(100),
+	provincia VARCHAR(100),
 	--Fks
 	id_admin INT
 );
@@ -170,6 +171,10 @@ ALTER TABLE clase
 ALTER TABLE clase
 	ADD CONSTRAINT fk_servicio FOREIGN KEY (id_servicio) 
 		REFERENCES servicio(id_servicio);
+
+ALTER TABLE clase
+	ADD CONSTRAINT fk_sucursal FOREIGN KEY (id_sucursal) 
+		REFERENCES sucursal(id_sucursal);
 
 ALTER TABLE cliente
 	ADD CONSTRAINT fk_instructor_cliente FOREIGN KEY (id_instructor) 
@@ -245,21 +250,21 @@ ALTER TABLE telefonossucursal
 
 
 -- Vistas
-CREATE OR REPLACE VIEW clases_disponibles
-AS SELECT
+CREATE OR REPLACE VIEW clases_disponibles AS
+SELECT
     s.descripcion AS nombre_servicio,
     c.grupal AS es_grupal,
     su.nombre_sucursal,
     c.capacidad,
-	CONCAT(e.nombres, ' ', e.apellidos) AS instructor,
+    COALESCE(CONCAT(e.nombres, ' ', e.apellidos), 'Sin instructor asignado') AS instructor,
     c.hora_inicio, 
     c.hora_fin, 
     c.fecha,
     (c.capacidad - COUNT(cxc.id_cliente)) AS cupos_disponibles
 FROM clase c
 JOIN servicio s ON c.id_servicio = s.id_servicio
-JOIN empleado e ON c.id_instructor = e.id_empleado
-JOIN sucursal su ON e.id_sucursal = su.id_sucursal 
+JOIN sucursal su ON c.id_sucursal = su.id_sucursal
+LEFT JOIN empleado e ON c.id_instructor = e.id_empleado
 LEFT JOIN clientexclase cxc ON c.id_clase = cxc.id_clase
 GROUP BY 
     s.descripcion, 

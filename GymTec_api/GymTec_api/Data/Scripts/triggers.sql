@@ -80,18 +80,21 @@ RETURNS TRIGGER AS $$
 DECLARE
     desc_puesto TEXT;
 BEGIN
-    SELECT p.descripcion INTO desc_puesto
-    FROM empleado e
-    JOIN puesto p ON e.id_puesto = p.id_puesto
-    WHERE e.id_empleado = NEW.id_instructor;
+    IF NEW.id_instructor IS NOT NULL THEN
+        SELECT p.descripcion INTO desc_puesto
+        FROM empleado e
+        JOIN puesto p ON e.id_puesto = p.id_puesto
+        WHERE e.id_empleado = NEW.id_instructor;
 
-    IF desc_puesto IS DISTINCT FROM 'instructor' THEN
-        RAISE EXCEPTION 'El id_instructor en clase no es válido (no es un Instructor)';
+        IF desc_puesto IS DISTINCT FROM 'instructor' THEN
+            RAISE EXCEPTION 'El id_instructor en clase no es válido (no es un Instructor)';
+        END IF;
     END IF;
 
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
 
 CREATE TRIGGER trg_validate_instructor_clase_insert
     BEFORE INSERT ON clase
@@ -138,23 +141,25 @@ DECLARE
     id_sucursal_instructor INT;
     existe BOOL;
 BEGIN
-    -- Obtener sucursal del instructor
-    SELECT id_sucursal INTO id_sucursal_instructor
-    FROM empleado
-    WHERE id_empleado = NEW.id_instructor;
+    IF NEW.id_instructor IS NOT NULL THEN
+        -- Obtener sucursal del instructor
+        SELECT id_sucursal INTO id_sucursal_instructor
+        FROM empleado
+        WHERE id_empleado = NEW.id_instructor;
 
-    IF id_sucursal_instructor IS NULL THEN
-        RAISE EXCEPTION 'Instructor sin sucursal asignada';
-    END IF;
+        IF id_sucursal_instructor IS NULL THEN
+            RAISE EXCEPTION 'Instructor sin sucursal asignada';
+        END IF;
 
-    -- Validar que el servicio esté disponible en esa sucursal
-    SELECT TRUE INTO existe
-    FROM sucursalxservicio
-    WHERE id_sucursal = id_sucursal_instructor
-      AND id_servicio = NEW.id_servicio;
+        -- Validar que el servicio esté disponible en esa sucursal
+        SELECT TRUE INTO existe
+        FROM sucursalxservicio
+        WHERE id_sucursal = id_sucursal_instructor
+          AND id_servicio = NEW.id_servicio;
 
-    IF NOT FOUND THEN
-        RAISE EXCEPTION 'El servicio no está disponible en la sucursal del instructor';
+        IF NOT FOUND THEN
+            RAISE EXCEPTION 'El servicio no está disponible en la sucursal del instructor';
+        END IF;
     END IF;
 
     RETURN NEW;

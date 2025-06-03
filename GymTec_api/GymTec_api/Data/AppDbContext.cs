@@ -58,7 +58,13 @@ namespace GymTec_api.Data
             modelBuilder.Entity<Empleado>()
                 .HasOne(e => e.sucursal)
                 .WithMany(s => s.empleados)
-                .HasForeignKey(e => e.id_sucursal);
+                .HasForeignKey(e => e.id_sucursal)
+                .IsRequired(false);
+
+            modelBuilder.Entity<Sucursal>()
+                .Property(s => s.id_admin)
+                .IsRequired(false);
+
 
             // Empleado(N) con Planilla(1)
             modelBuilder.Entity<Empleado>()
@@ -113,6 +119,12 @@ namespace GymTec_api.Data
                 .HasOne(ts => ts.sucursal)
                 .WithMany(s => s.telefonos)
                 .HasForeignKey(ts => ts.id_sucursal);
+
+            // Clase(N) con Sucursal(1)
+            modelBuilder.Entity<Clase>()
+                .HasOne(c => c.sucursal)
+                .WithMany(s => s.clases)
+                .HasForeignKey(c => c.id_sucursal);
 
             // ============== Relaciones N a M ==============
             // Cliente(N) con Clase(M)

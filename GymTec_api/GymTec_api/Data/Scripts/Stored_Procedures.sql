@@ -153,6 +153,21 @@ BEGIN
 END;
 $$;
 
+--Eliminar planillas
+CREATE OR REPLACE PROCEDURE eliminar_planilla(planilla_id INT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Eliminar relaciones en empleado
+    DELETE FROM empleado
+    WHERE id_planilla = planilla_id;
+
+    -- Eliminar planilla en tabla planilla
+    DELETE FROM planilla
+    WHERE id_planilla = planilla_id;
+END;
+$$;
+
 -- Eliminar clases
 CREATE OR REPLACE PROCEDURE eliminar_clase(clase_id INT)
 LANGUAGE plpgsql

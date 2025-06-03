@@ -31,6 +31,10 @@ namespace GymTec_api.Controllers
             {
                 return BadRequest("Cliente no puede ser nulo");
             }
+
+            // Encriptar contraseña
+            cliente.password = BCrypt.Net.BCrypt.HashPassword(cliente.password);
+
             _context.cliente.Add(cliente);
             _context.SaveChanges();
             return CreatedAtAction(nameof(GetClientes), new { id = cliente.id_cliente }, cliente);

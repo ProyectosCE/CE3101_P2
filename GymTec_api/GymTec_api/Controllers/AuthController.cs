@@ -20,7 +20,7 @@ namespace GymTec_api.Controllers
                 string.IsNullOrWhiteSpace(request.correo) ||
                 string.IsNullOrWhiteSpace(request.password))
             {
-                return BadRequest(new { mensaje = "Faltan datos para iniciar sesión", rol = (string)null });
+                return BadRequest(new { succes = false, mensaje = "Faltan datos para iniciar sesión", rol = (string)null });
             }
 
             if (request.rol == "cliente")
@@ -29,13 +29,14 @@ namespace GymTec_api.Controllers
 
                 if (cliente == null)
                 {
-                    return NotFound(new { mensaje = "No existe una cuenta cliente con ese correo", rol = "cliente" });
+                    return NotFound(new {succes = false, mensaje = "No existe una cuenta cliente con ese correo", rol = "cliente" });
                 }
 
                 if (BCrypt.Net.BCrypt.Verify(request.password, cliente.password))
                 {
                     return Ok(new
                     {
+                        success = true,
                         mensaje = "inicio sesión exitoso",
                         rol = "cliente",
                         id = cliente.id_cliente,
@@ -44,7 +45,7 @@ namespace GymTec_api.Controllers
                 }
                 else
                 {
-                    return Unauthorized(new { mensaje = "contraseña o correo invalidos", rol = "cliente" });
+                    return Unauthorized(new { succes = false, mensaje = "contraseña o correo invalidos", rol = "cliente" });
                 }
             }
             else
@@ -52,7 +53,7 @@ namespace GymTec_api.Controllers
                 var puesto = _context.puesto.SingleOrDefault(p => p.descripcion == request.rol);
                 if (puesto == null)
                 {
-                    return BadRequest(new { mensaje = "Rol inválido", rol = (string)null });
+                    return BadRequest(new { succes = false, mensaje = "Rol inválido", rol = (string)null });
                 }
 
                 var empleado = _context.empleado
@@ -60,13 +61,14 @@ namespace GymTec_api.Controllers
 
                 if (empleado == null)
                 {
-                    return NotFound(new { mensaje = $"No existe una cuenta con el rol '{request.rol}' para ese correo", rol = request.rol });
+                    return NotFound(new { succes = false, mensaje = $"No existe una cuenta con el rol '{request.rol}' para ese correo", rol = request.rol });
                 }
 
                 if (BCrypt.Net.BCrypt.Verify(request.password, empleado.password))
                 {
                     return Ok(new
                     {
+                        succes = true,
                         mensaje = "inicio sesión exitoso",
                         rol = request.rol,
                         id = empleado.id_empleado,
@@ -75,7 +77,7 @@ namespace GymTec_api.Controllers
                 }
                 else
                 {
-                    return Unauthorized(new { mensaje = "contraseña o correo inválidos", rol = request.rol });
+                    return Unauthorized(new { succes = false, mensaje = "contraseña o correo inválidos", rol = request.rol });
                 }
             }
         }

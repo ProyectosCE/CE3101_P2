@@ -1,5 +1,6 @@
 ﻿using GymTec_api.Data;
 using GymTec_api.Models;
+using GymTec_api.Models.Vistas;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GymTec_api.Controllers
@@ -74,6 +75,17 @@ namespace GymTec_api.Controllers
             return NoContent();
         }
 
-        // GET: api/clase/{id_sucursal}
+        //GET: api/clase/clases_disponibles
+        [HttpGet("clases_disponibles")]
+        public ActionResult<IEnumerable<ClaseDisponible>> GetClasesDisponibles()
+        {
+            var clasesDisponibles = _context.clases_disponibles.ToList();
+            if (clasesDisponibles == null || !clasesDisponibles.Any())
+            {
+                return NotFound("No hay clases disponibles.");
+            }
+            return Ok(clasesDisponibles);
+        }
+
     }
 }

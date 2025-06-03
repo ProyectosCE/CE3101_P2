@@ -245,14 +245,13 @@ ALTER TABLE telefonossucursal
 
 
 -- Vistas
-CREATE OR REPLACE VIEW clases_disponibles_por_sucursal 
+CREATE OR REPLACE VIEW clases_disponibles
 AS SELECT
-    c.id_clase, 
     s.descripcion AS nombre_servicio,
     c.grupal AS es_grupal,
     su.nombre_sucursal,
     c.capacidad,
-	CONCAT(e.nombres, ' ', e.apellidos) AS nombre_completo_instructor,
+	CONCAT(e.nombres, ' ', e.apellidos) AS instructor,
     c.hora_inicio, 
     c.hora_fin, 
     c.fecha,
@@ -263,7 +262,6 @@ JOIN empleado e ON c.id_instructor = e.id_empleado
 JOIN sucursal su ON e.id_sucursal = su.id_sucursal 
 LEFT JOIN clientexclase cxc ON c.id_clase = cxc.id_clase
 GROUP BY 
-    c.id_clase, 
     s.descripcion, 
     c.grupal, 
     su.nombre_sucursal, 

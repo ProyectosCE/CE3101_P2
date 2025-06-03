@@ -1,4 +1,5 @@
 ﻿using GymTec_api.Models;
+using GymTec_api.Models.Vistas;
 using Microsoft.EntityFrameworkCore;
 
 namespace GymTec_api.Data
@@ -27,6 +28,9 @@ namespace GymTec_api.Data
         public DbSet<TelefonosSucursal> telefonossucursal { get; set; }
         public DbSet<Tipo_Equipo> tipo_equipo { get; set; }
         public DbSet<Tratamiento> tratamiento { get; set; }
+
+        // Vistas
+        public DbSet<ClaseDisponible> clases_disponibles { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -158,6 +162,13 @@ namespace GymTec_api.Data
                 .HasOne(st => st.tratamiento)
                 .WithMany(t => t.sucursales)
                 .HasForeignKey(st => st.id_tratamiento);
+
+            //================ Relaciones con Vistas ==============
+
+            // clase_disponible
+            modelBuilder.Entity<ClaseDisponible>()
+                .HasNoKey()
+                .ToView("clases_disponibles");
         }
     }
 }

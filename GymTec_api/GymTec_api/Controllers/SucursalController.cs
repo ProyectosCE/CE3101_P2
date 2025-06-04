@@ -5,6 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
+using System.Data;
 
 namespace GymTec_api.Controllers
 {
@@ -191,6 +193,74 @@ namespace GymTec_api.Controllers
             }
         }
 
+
+        // GET: api/sucursal/generar_planilla/{id_sucursal}
+        [HttpGet("generar_planilla/{id_sucursal}")]
+        public IActionResult GenerarPlanilla([FromRoute] int id_sucursal)
+        {
+            var results = new List<PlanillaEmpleadoDTO>();
+
+            try
+            {
+                using var connection = new NpgsqlConnection(_context.Database.GetConnectionString());
+                connection.Open();
+
+                // Inicia una transacción para mantener el cursor abierto
+                using var transaction = connection.BeginTransaction();
+
+                // Llama al procedimiento almacenado
+                using (var cmd = new NpgsqlCommand("CALL generar_planilla_sucursal(@p_id_sucursal, @ref)", connection, transaction))
+                {
+                    cmd.Parameters.AddWithValue("p_id_sucursal", id_sucursal);
+                    cmd.Parameters.Add(new NpgsqlParameter("ref", NpgsqlTypes.NpgsqlDbType.Refcursor)
+                    {
+                        Direction = ParameterDirection.InputOutput,
+                        Value = "planilla_cursor"
+                    });
+
+                    cmd.ExecuteNonQuery();
+                }
+
+                // Obtén los resultados del cursor
+                using (var fetch = new NpgsqlCommand("FETCH ALL IN planilla_cursor", connection, transaction))
+                using (var reader = fetch.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        results.Add(new PlanillaEmpleadoDTO
+                        {
+                            cedula = reader.GetString(0),
+                            nombre_empleado = reader.GetString(1),
+                            tipo_planilla = reader.GetString(2),
+                            unidades_trabajadas = reader.GetInt32(3),
+                            monto_pagar = reader.GetDecimal(4),
+                            nombre_sucursal = reader.GetString(5)
+                        });
+                    }
+                }
+
+                // Termina la transacción
+                transaction.Commit();
+
+                return Ok(new { success = true, data = results });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
+        }
+
+
+    }
+
+    public class PlanillaEmpleadoDTO
+    {
+        public string cedula { get; set; }
+        public string nombre_empleado { get; set; }
+        public string tipo_planilla { get; set; }
+        public int unidades_trabajadas { get; set; }
+        public decimal monto_pagar { get; set; }
+        public string nombre_sucursal { get; set; }
     }
 
 }

@@ -244,4 +244,70 @@ BEGIN
 END;
 $$;
 
+-- Eliminar Empleados
+CREATE OR REPLACE PROCEDURE eliminar_empleado(empleado_id INT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Null en id_admin de sucursal si el empleado es un administrador
+    UPDATE sucursal
+    SET id_admin = NULL
+    WHERE id_admin = empleado_id;
+
+    -- Null en id_instructor de clase si el empleado es un instructor
+    UPDATE clase
+    SET id_instructor = NULL
+    WHERE id_instructor = empleado_id;
+
+    -- Null en id_instructor de cliente si el empleado es un instructor
+    UPDATE cliente
+    SET id_instructor = NULL
+    WHERE id_instructor = empleado_id;
+
+    -- Eliminar el empleado
+    DELETE FROM empleado
+    WHERE id_empleado = empleado_id;
+END;
+$$;
+
+/*
+    =========================================================
+                       Generar Planilla
+    =========================================================
+*/
+
+
+CREATE OR REPLACE PROCEDURE generar_planilla_sucursal(
+    IN p_id_sucursal INT,
+    INOUT ref REFCURSOR
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    OPEN ref FOR
+    SELECT
+        e.cedula,
+        e.nombres || ' ' || e.apellidos AS nombre_empleado,
+        p.descripcion AS tipo_planilla,
+        CASE p.descripcion
+            WHEN 'Pago mensual' THEN 1
+            WHEN 'Pago por horas' THEN e.clases_horas
+            WHEN 'Pago por clase' THEN e.clases_horas
+            ELSE 0
+        END AS unidades_trabajadas,
+        CASE p.descripcion
+            WHEN 'Pago mensual' THEN e.salario
+            WHEN 'Pago por horas' THEN e.salario * e.clases_horas
+            WHEN 'Pago por clase' THEN e.salario * e.clases_horas
+            ELSE 0
+        END AS monto_pagar,
+        s.nombre_sucursal
+    FROM empleado e
+    JOIN planilla p ON e.id_planilla = p.id_planilla
+    JOIN sucursal s ON e.id_sucursal = s.id_sucursal
+    WHERE e.id_sucursal = p_id_sucursal
+    ORDER BY e.nombres, e.apellidos;
+END;
+$$;
+
 

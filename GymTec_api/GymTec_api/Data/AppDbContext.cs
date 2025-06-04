@@ -1,4 +1,5 @@
-﻿using GymTec_api.Models;
+﻿using GymTec_api.Controllers;
+using GymTec_api.Models;
 using GymTec_api.Models.Vistas;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,6 +33,8 @@ namespace GymTec_api.Data
         // Vistas
         public DbSet<ClaseDisponible> clases_disponibles { get; set; }
 
+        // DTOs
+        public DbSet<PlanillaEmpleadoDTO> planillaEmpleadoDTO { get; set; } 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -181,6 +184,10 @@ namespace GymTec_api.Data
             modelBuilder.Entity<ClaseDisponible>()
                 .HasNoKey()
                 .ToView("clases_disponibles");
+
+            //====================== DTOs =======================
+            modelBuilder.Entity<PlanillaEmpleadoDTO>().HasNoKey();
+
         }
     }
 }

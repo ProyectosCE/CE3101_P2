@@ -27,8 +27,7 @@ INSERT INTO servicio (descripcion, is_default) VALUES
 ('Pilates',TRUE),
 ('Yoga',TRUE),
 ('Zumba',TRUE),
-('Natación',TRUE),
-('Tienda de suplementos',TRUE);
+('Natación',TRUE);
 
 -- Tipo_Equipo
 INSERT INTO tipo_equipo (descripcion) VALUES

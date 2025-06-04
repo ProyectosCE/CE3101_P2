@@ -9,8 +9,8 @@ namespace GymTec_api.Models
         // Atributos
         [Key]
         public int id_clase { get; set; }
-        public TimeSpan hora_inicio { get; set; }
-        public TimeSpan hora_fin { get; set; }
+        public TimeOnly hora_inicio { get; set; }
+        public TimeOnly hora_fin { get; set; }
         public bool grupal { get; set; } = false;
         public int capacidad { get; set; }
         public DateOnly fecha { get; set; }

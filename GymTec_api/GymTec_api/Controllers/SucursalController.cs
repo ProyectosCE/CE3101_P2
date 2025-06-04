@@ -205,10 +205,10 @@ namespace GymTec_api.Controllers
                 using var connection = new NpgsqlConnection(_context.Database.GetConnectionString());
                 connection.Open();
 
-                // Inicia una transacción para mantener el cursor abierto
+                // Iniciar una transacción para mantener el cursor abierto
                 using var transaction = connection.BeginTransaction();
 
-                // Llama al procedimiento almacenado
+                // Llamar al procedimiento almacenado
                 using (var cmd = new NpgsqlCommand("CALL generar_planilla_sucursal(@p_id_sucursal, @ref)", connection, transaction))
                 {
                     cmd.Parameters.AddWithValue("p_id_sucursal", id_sucursal);
@@ -221,7 +221,7 @@ namespace GymTec_api.Controllers
                     cmd.ExecuteNonQuery();
                 }
 
-                // Obtén los resultados del cursor
+                // Obtener los resultados del cursor
                 using (var fetch = new NpgsqlCommand("FETCH ALL IN planilla_cursor", connection, transaction))
                 using (var reader = fetch.ExecuteReader())
                 {
@@ -239,7 +239,7 @@ namespace GymTec_api.Controllers
                     }
                 }
 
-                // Termina la transacción
+                // Terminar la transacción
                 transaction.Commit();
 
                 return Ok(new { success = true, data = results });

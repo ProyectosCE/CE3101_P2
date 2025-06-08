@@ -15,7 +15,7 @@
 /* ==== LOGO CENTRADO EN LA PARTE SUPERIOR ==== */
 .logoContainer {
   position: absolute;
-  top: 0px;           /* Subido al tope superior */
+  top: 0px;           /* Subido al maximo */
   left: 50%;
   transform: translateX(-50%);
   z-index: 0;
@@ -25,7 +25,7 @@
   height: auto;
   display: block;
   z-index: 0;
-  /* Sin sombra ni borde para que "flote" limpio */
+  /* Sin sombra ni borde  */
 }
 
 /* ==== BOTÓN “INICIO” EN ESQUINA SUPERIOR IZQUIERDA ==== */
@@ -66,7 +66,7 @@
 }
 
 /* ==== ENCABEZADOS ==== */
-/* Colocamos el encabezado unos píxeles debajo del logo, y lo centramos */
+/* colocar en el encabezado unos píxeles debajo del logo, y se centra */
 .mainHeader {
   margin-top: 80px;         /* Baja el texto para quedar justo debajo del logo */
   font-size: 2rem;
@@ -90,7 +90,7 @@
 }
 
 /* ==== TARJETAS DEL DASHBOARD ==== */
-/* Aumentamos el ancho máximo del contenedor para que quepan las 3 tarjetas sin scroll */
+/* se aumenta el ancho máximo del contenedor para que quepan las 3 tarjetas sin scroll */
 .contentCard {
   background-color: #ffffff;
   border: 2px solid #6ecff6;
@@ -107,12 +107,11 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-/* Ahora las tarjetas serán más amplias y el contenedor las mostrará en fila sin scroll */
 .cardsRow {
   display: flex;
   justify-content: center; /* Centra horizontalmente */
   gap: 2rem;
-  flex-wrap: nowrap;       /* Forzamos que queden en una sola fila */
+  flex-wrap: nowrap;       /* que queden en una sola fila */
   margin-top: 4rem;        /* Espacio entre subtítulo y tarjetas */
 }
 .cardCustom {
@@ -120,7 +119,7 @@
   border: 2px solid #6ecff6;
   border-radius: 14px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-  width: 350px;            /* Aumentado de 300px a 350px para mayor legibilidad */
+  width: 350px;            
   height: 380px;
   display: flex;
   flex-direction: column;
@@ -178,7 +177,7 @@
 }
 
 /* ==== “CONTENT CARD” PARA PANTALLAS DERIVADAS ==== */
-/* (Se deja igual para consistencia) */
+
 .contentCard h3 {
   font-size: 1.5rem;
   margin-bottom: 1rem;

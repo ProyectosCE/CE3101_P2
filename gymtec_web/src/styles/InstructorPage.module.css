@@ -1,0 +1,263 @@
+/* src/styles/InstructorPage.module.css */
+
+/* ==== FONDO GLOBAL (ligero degradado) ==== */
+.pageContainer {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e0f7fa 0%, #ffffff 100%);
+  padding-top: 120px; /* espacio para botón Inicio, logo y botón Cerrar Sesión */
+  padding-left: 1rem;
+  padding-right: 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333333;
+}
+
+/* ==== LOGO CENTRADO EN LA PARTE SUPERIOR ==== */
+.logoContainer {
+  position: absolute;
+  top: 0px;           /* Subido al tope superior */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 0;
+}
+.logoImage {
+  max-width: 250px;
+  height: auto;
+  display: block;
+  z-index: 0;
+  /* Sin sombra ni borde para que "flote" limpio */
+}
+
+/* ==== BOTÓN “INICIO” EN ESQUINA SUPERIOR IZQUIERDA ==== */
+.homeButton {
+  position: absolute;
+  top: 8px;        /* Ubicado justo debajo del tope superior */
+  left: 16px;      /* Margen izquierdo fijo */
+  background-color: #2575fc;
+  border: none;
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  z-index: 1;      /* Encima de la imagen */
+}
+.homeButton:hover {
+  background-color: #1b5ccb;
+}
+
+/* ==== BOTÓN CERRAR SESIÓN ==== */
+.logoutButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background-color: #dc3545;
+  border: none;
+  color: #ffffff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.logoutButton:hover {
+  background-color: #c82333;
+}
+
+/* ==== ENCABEZADOS ==== */
+/* Colocamos el encabezado unos píxeles debajo del logo, y lo centramos */
+.mainHeader {
+  margin-top: 80px;         /* Baja el texto para quedar justo debajo del logo */
+  font-size: 2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Centra horizontalmente */
+  text-align: center;      /* Asegura que si llegara a varias líneas, se centren */
+}
+.mainHeader i {
+  margin-right: 0.5rem;
+  color: #2575fc;
+}
+/* El subtítulo también centrado */
+.subHeader {
+  font-size: 1.1rem;
+  color: #555;
+  margin: 0 auto 2rem auto;
+  max-width: 600px;
+  text-align: center;
+}
+
+/* ==== TARJETAS DEL DASHBOARD ==== */
+/* Aumentamos el ancho máximo del contenedor para que quepan las 3 tarjetas sin scroll */
+.contentCard {
+  background-color: #ffffff;
+  border: 2px solid #6ecff6;
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  margin: 4rem auto;      /* Baja la tarjeta y la centra horizontalmente */
+  max-width: 1200px;      /* Aumentado desde 900px a 1200px */
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-align: justify;    /* Justifica texto dentro de la tarjeta */
+}
+.contentCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Ahora las tarjetas serán más amplias y el contenedor las mostrará en fila sin scroll */
+.cardsRow {
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+  gap: 2rem;
+  flex-wrap: nowrap;       /* Forzamos que queden en una sola fila */
+  margin-top: 4rem;        /* Espacio entre subtítulo y tarjetas */
+}
+.cardCustom {
+  background-color: #ffffff;
+  border: 2px solid #6ecff6;
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  width: 350px;            /* Aumentado de 300px a 350px para mayor legibilidad */
+  height: 380px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-align: justify;     /* Justifica cualquier texto dentro */
+  flex-shrink: 0;          /* Evita que se reduzca aún más */
+}
+.cardCustom:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+.cardHeader {
+  background: linear-gradient(90deg, #2575fc 0%, #6ecff6 100%);
+  color: #ffffff;
+  padding: 1rem;
+  font-weight: 700;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Centra texto e ícono */
+}
+.cardHeader i {
+  margin-right: 0.6rem;
+}
+.cardBody {
+  padding: 1.2rem;
+  flex-grow: 1;
+  font-size: 1.05rem;
+  color: #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.cardButton {
+  background-color: #2575fc;
+  border: none;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0.9rem 0;
+  border-radius: 6px;
+  text-align: center;
+  cursor: pointer;
+  width: 85%;
+  margin: 1.2rem auto;
+  font-size: 1.1rem;
+  transition: background-color 0.2s;
+}
+.cardButton i {
+  margin-right: 0.5rem;
+}
+.cardButton:hover {
+  background-color: #1b5ccb;
+}
+
+/* ==== “CONTENT CARD” PARA PANTALLAS DERIVADAS ==== */
+/* (Se deja igual para consistencia) */
+.contentCard h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Centra el texto del h3 en la tarjeta */
+  color: #2575fc;
+}
+.contentCard h3 i {
+  margin-right: 0.5rem;
+}
+
+/* ==== TABLA DENTRO DE contentCard ==== */
+.contentCard table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+.contentCard th {
+  background-color: #2575fc;
+  color: #ffffff;
+  padding: 0.75rem;
+  text-align: left;
+}
+.contentCard td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #ddd;
+  vertical-align: middle;
+}
+
+/* ==== FORMULARIOS DENTRO DE contentCard ==== */
+.contentCard .form-label {
+  font-weight: 600;
+  color: #333;
+}
+.contentCard .form-control,
+.contentCard .form-select {
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  transition: border-color 0.2s;
+}
+.contentCard .form-control:focus,
+.contentCard .form-select:focus {
+  border-color: #2575fc;
+  box-shadow: 0 0 0 2px rgba(37, 117, 252, 0.2);
+}
+.contentCard .btn-success {
+  background-color: #2575fc;
+  border: none;
+  padding: 0.8rem 1.4rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+.contentCard .btn-success:hover {
+  background-color: #1b5ccb;
+}
+
+/* ==== RESPONSIVE ==== */
+@media (max-width: 768px) {
+  /* En pantallas pequeñas, se permiten varias líneas si hace falta */
+  .cardsRow {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .cardCustom {
+    width: 90%;
+    height: auto;
+  }
+  .logoImage {
+    max-width: 200px;
+  }
+  .contentCard {
+    margin: 2rem auto;
+    padding: 1.5rem;
+    width: 90%;
+  }
+  .homeButton {
+    left: 16px;   /* Mantiene alineación al borde en móvil */
+    top: 16px;    /* Ajusta para no superponerse */
+  }
+}

@@ -1,0 +1,202 @@
+/* src/styles/ClientPage.module.css */
+
+/* ==== FONDO GLOBAL (ligero degradado) ==== */
+.pageContainer {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e0f7fa 0%, #ffffff 100%);
+  padding-top: 120px; /* espacio para logo, botones */
+  padding-left: 1rem;
+  padding-right: 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333333;
+}
+
+/* ==== LOGO CENTRADO ==== */
+.logoContainer {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 0;
+}
+.logoImage {
+  max-width: 250px;
+  height: auto;
+  display: block;
+}
+
+/* ==== BOTÓN “INICIO” ==== */
+.homeButton {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  background-color: #2575fc;
+  border: none;
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  z-index: 1;
+}
+.homeButton:hover {
+  background-color: #1b5ccb;
+}
+
+/* ==== BOTÓN “CERRAR SESIÓN” ==== */
+.logoutButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background-color: #dc3545;
+  border: none;
+  color: #ffffff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.logoutButton:hover {
+  background-color: #c82333;
+}
+
+/* ==== ENCABEZADOS ==== */
+.mainHeader {
+  margin-top: 80px;
+  font-size: 2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.mainHeader i {
+  margin-right: 0.5rem;
+  color: #2575fc;
+}
+.subHeader {
+  font-size: 1.1rem;
+  color: #555;
+  margin: 0 auto 2rem;
+  max-width: 600px;
+  text-align: center;
+}
+
+/* ==== TARJETAS DEL DASHBOARD ==== */
+.cardsRow {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: nowrap;
+  margin-top: 4rem;
+}
+.cardCustom {
+  background-color: #ffffff;
+  border: 2px solid #6ecff6;
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+  width: 350px;
+  height: 380px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  flex-shrink: 0;
+}
+.cardCustom:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+.cardHeader {
+  background: linear-gradient(90deg, #2575fc 0%, #6ecff6 100%);
+  color: #fff;
+  padding: 1rem;
+  font-weight: 700;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cardHeader i {
+  margin-right: 0.6rem;
+}
+.cardBody {
+  padding: 1.2rem;
+  flex-grow: 1;
+  font-size: 1.05rem;
+  color: #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.cardButton {
+  background-color: #2575fc;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.9rem 0;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 85%;
+  margin: 1.2rem auto;
+  font-size: 1.1rem;
+  transition: background-color 0.2s;
+}
+.cardButton i {
+  margin-right: 0.5rem;
+}
+.cardButton:hover {
+  background-color: #1b5ccb;
+}
+
+/* ==== “CONTENT CARD” PARA PANTALLAS DERIVADAS ==== */
+.contentCard {
+  background-color: #ffffff;
+  border: 2px solid #6ecff6;
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+  padding: 2rem;
+  margin: 4rem auto;
+  max-width: 900px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-align: justify;
+}
+.contentCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+.contentCard h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2575fc;
+}
+.contentCard h3 i {
+  margin-right: 0.5rem;
+}
+
+/* ==== RESPONSIVE ==== */
+@media (max-width: 768px) {
+  .cardsRow {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .cardCustom {
+    width: 90%;
+    height: auto;
+  }
+  .logoImage {
+    max-width: 200px;
+  }
+  .contentCard {
+    margin: 2rem auto;
+    padding: 1.5rem;
+    width: 90%;
+  }
+}

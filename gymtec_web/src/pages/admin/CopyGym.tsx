@@ -32,12 +32,13 @@ export default function CopyGymPage() {
   const router = useRouter();
 
   const [branches, setBranches] = useState<Branch[]>([]);
-  const [selectedId, setSelectedId] = useState<number | ''>('');
+  const [sourceId, setSourceId] = useState<number | ''>('');
+  const [destId, setDestId] = useState<number | ''>('');
   const [treatments, setTreatments] = useState<Treatment[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [classes, setClasses] = useState<Clase[]>([]);
 
-  // Carga inicial de sucursales (simulado)
+  // Cargar sucursales (simulado)
   useEffect(() => {
     setBranches([
       { id: 1, nombre: 'Central Cartago' },
@@ -48,12 +49,10 @@ export default function CopyGymPage() {
     ]);
   }, []);
 
-  // Al cambiar de sucursal, carga sus detalles (simulado)
+  // Al cambiar el source, recargar datos
   useEffect(() => {
-    if (selectedId === '') return;
-
-    // Aquí vendrán llamadas a la API para cada entidad...
-    // Simulación:
+    if (!sourceId) return;
+    // Simulación de fetch de datos de la sucursal origen
     setTreatments([
       { id: 1, nombre: 'Masaje relajante' },
       { id: 2, nombre: 'Sauna' },
@@ -66,21 +65,30 @@ export default function CopyGymPage() {
       { id: 101, servicio: 'Yoga', modalidad: 'Grupal', fecha: '2025-06-10' },
       { id: 102, servicio: 'Pilates', modalidad: 'Individual', fecha: '2025-06-11' },
     ]);
-  }, [selectedId]);
+    // Limpiar selección de destino si coincide
+    if (destId === sourceId) {
+      setDestId('');
+    }
+  }, [sourceId]);
 
   const handleCopy = () => {
-    if (!selectedId) return;
+    if (!sourceId || !destId) return;
+    const src = branches.find(b => b.id === sourceId)?.nombre;
+    const dst = branches.find(b => b.id === destId)?.nombre;
     if (
       window.confirm(
-        '¿Seguro que desea copiar el gimnasio "' +
-          branches.find(b => b.id === selectedId)?.nombre +
-          '"?'
+        `¿Confirma copiar la sucursal "${src}" al destino "${dst}"?`
       )
     ) {
-      // Aquí se invocaría a la API que copia todo en backend...
-      alert('Gimnasio copiado con éxito.');
+      // aquí iría la llamada real al API
+      alert(`Datos copiados de "${src}" hacia "${dst}" con éxito.`);
       router.push('/admin/Dashboard');
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
   };
 
   return (
@@ -97,7 +105,10 @@ export default function CopyGymPage() {
       >
         <i className="fas fa-home"></i> Inicio
       </button>
-      <button className={styles.logoutButton} onClick={() => { logout(); router.push('/login'); }}>
+      <button
+        className={styles.logoutButton}
+        onClick={handleLogout}
+      >
         <i className="fas fa-sign-out-alt"></i> Cerrar Sesión
       </button>
 
@@ -106,28 +117,45 @@ export default function CopyGymPage() {
         <i className="fas fa-clone"></i> Copiar Gimnasio
       </h2>
       <p className={styles.subHeader}>
-        Seleccione una sucursal origen para copiar todos sus datos.
+        Seleccione origen y destino para copiar todos los datos.
       </p>
 
-      {/* Selector de Sucursal */}
-      <div className="mb-4">
-        <label className="form-label"><strong>Sucursal origen</strong></label>
+      {/* Selector de origen */}
+      <div className="mb-3">
+        <label className="form-label"><strong>Sucursal Origen:</strong></label>
         <select
           className="form-select"
-          value={selectedId}
-          onChange={e => setSelectedId(e.target.value ? Number(e.target.value) : '')}
+          value={sourceId}
+          onChange={e => setSourceId(e.target.value ? Number(e.target.value) : '')}
         >
-          <option value="">-- Elija una sucursal --</option>
+          <option value="">-- Elija origen --</option>
           {branches.map(b => (
-            <option key={b.id} value={b.id}>
-              {b.nombre}
-            </option>
+            <option key={b.id} value={b.id}>{b.nombre}</option>
           ))}
         </select>
       </div>
 
-      {/* Detalles */}
-      {selectedId !== '' && (
+      {/* Selector de destino */}
+      {sourceId && (
+        <div className="mb-4">
+          <label className="form-label"><strong>Sucursal Destino:</strong></label>
+          <select
+            className="form-select"
+            value={destId}
+            onChange={e => setDestId(e.target.value ? Number(e.target.value) : '')}
+          >
+            <option value="">-- Elija destino --</option>
+            {branches
+              .filter(b => b.id !== sourceId)
+              .map(b => (
+                <option key={b.id} value={b.id}>{b.nombre}</option>
+              ))}
+          </select>
+        </div>
+      )}
+
+      {/* Detalles de la sucursal origen */}
+      {sourceId && destId && (
         <div className={styles.sectionContainer}>
           {/* Tratamientos */}
           <h5><i className="fas fa-spa"></i> Tratamientos de Spa</h5>

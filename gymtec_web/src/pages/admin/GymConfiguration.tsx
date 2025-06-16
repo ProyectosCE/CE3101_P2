@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
-import styles from '../../styles/AdminPage.module.css';
+import styles from '../../styles/ConfigurationPage.module.css';
 
 export default function GymConfiguration() {
   const { logout } = useAuth();

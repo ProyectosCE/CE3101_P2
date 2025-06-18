@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
+using NpgsqlTypes;
 
 namespace GymTec_api.Controllers
 {
@@ -120,5 +121,62 @@ namespace GymTec_api.Controllers
             }
 
         }
+
+        // POST: api/plantrabajo/copiar_actividades
+        [HttpPost("copiar_actividades")]
+        public IActionResult CopiarActividadesSemana([FromBody] CopiarActividadesDTO dto)
+        {
+            try
+            {
+                var conn = _context.Database.GetDbConnection();
+                conn.Open();
+
+                using var command = conn.CreateCommand();
+                command.CommandText = "CALL copiar_actividades_semana(@id, @start, @end, @newstart, @newend)";
+
+                // ID del plan de trabajo
+                command.Parameters.Add(new Npgsql.NpgsqlParameter("@id", NpgsqlDbType.Integer){
+                    Value = dto.id_plan_trabajo
+                });
+                // Semana de inicio y fin
+                command.Parameters.Add(new Npgsql.NpgsqlParameter("@start", NpgsqlDbType.Date)
+                {
+                    Value = dto.start_date.ToDateTime(TimeOnly.MinValue)
+                });
+                command.Parameters.Add(new Npgsql.NpgsqlParameter("@end", NpgsqlDbType.Date)
+                {
+                    Value = dto.end_date.ToDateTime(TimeOnly.MinValue)
+                });
+                // Nueva semana de inicio y fin
+                command.Parameters.Add(new Npgsql.NpgsqlParameter("@newstart", NpgsqlDbType.Date)
+                {
+                    Value = dto.new_start_date.ToDateTime(TimeOnly.MinValue)
+                });
+                command.Parameters.Add(new Npgsql.NpgsqlParameter("@newend", NpgsqlDbType.Date)
+                {
+                    Value = dto.new_end_date.ToDateTime(TimeOnly.MinValue)
+                });
+
+                command.ExecuteNonQuery();
+                conn.Close();
+
+                return Ok(new { success = true, message = "Actividades copiadas correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
+        }
+
     }
+
+    public class CopiarActividadesDTO
+    {
+        public int id_plan_trabajo { get; set; }
+        public DateOnly start_date { get; set; }
+        public DateOnly end_date { get; set; }
+        public DateOnly new_start_date { get; set; }
+        public DateOnly new_end_date { get; set; }
+    }
+
 }

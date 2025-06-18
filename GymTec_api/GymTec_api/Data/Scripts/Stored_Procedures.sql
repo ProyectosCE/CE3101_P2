@@ -1,4 +1,4 @@
-
+﻿
 /*
     =========================================================
                           COPIAR DATOS
@@ -63,6 +63,70 @@ BEGIN
     WHERE id_sucursal = p_id_sucursal;
 
     RETURN v_new_id_sucursal;
+END;
+$$;
+
+-- Copiar actividades de una semana a otra
+
+CREATE OR REPLACE PROCEDURE copiar_actividades_semana(
+    p_id_plan_trabajo INT,
+    p_start_date      DATE,
+    p_end_date        DATE,
+    p_new_start_date  DATE,
+    p_new_end_date    DATE
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    actividad      detalleplan%ROWTYPE;
+    fecha_offset   INTERVAL;
+    count_origen   INT;
+    count_destino  INT;
+BEGIN
+    -- Validar que los rangos sean lunes–domingo y de 7 días exactos 
+    IF EXTRACT(DOW FROM p_start_date)     != 1 OR EXTRACT(DOW FROM p_end_date)     != 0
+       OR EXTRACT(DOW FROM p_new_start_date) != 1 OR EXTRACT(DOW FROM p_new_end_date) != 0
+       OR p_end_date - p_start_date        != 6
+       OR p_new_end_date - p_new_start_date!= 6
+    THEN
+        RAISE EXCEPTION 'Los rangos deben ir de lunes a domingo y durar exactamente 7 días.';
+    END IF;
+
+    -- ¿Hay actividades en la semana origen? */
+    SELECT COUNT(*) INTO count_origen
+    FROM detalleplan
+    WHERE id_plan_trabajo = p_id_plan_trabajo
+      AND fecha BETWEEN p_start_date AND p_end_date;
+
+    IF count_origen = 0 THEN
+        RAISE EXCEPTION 'La semana origen no tiene actividades; no hay nada que copiar.';
+    END IF;
+
+    -- ¿La semana destino ya contiene actividades? 
+    SELECT COUNT(*) INTO count_destino
+    FROM detalleplan
+    WHERE id_plan_trabajo = p_id_plan_trabajo
+      AND fecha BETWEEN p_new_start_date AND p_new_end_date;
+
+    IF count_destino > 0 THEN
+        RAISE EXCEPTION 'La semana destino ya tiene actividades; la copia ha sido cancelada.';
+    END IF;
+
+    -- ▸ Copiar actividades día a día 
+    FOR actividad IN
+        SELECT * FROM detalleplan
+        WHERE id_plan_trabajo = p_id_plan_trabajo
+          AND fecha BETWEEN p_start_date AND p_end_date
+    LOOP
+        fecha_offset := actividad.fecha - p_start_date;
+
+        INSERT INTO detalleplan (fecha, actividad, id_plan_trabajo)
+        VALUES (
+            p_new_start_date + fecha_offset,
+            actividad.actividad,
+            p_id_plan_trabajo
+        );
+    END LOOP;
 END;
 $$;
 

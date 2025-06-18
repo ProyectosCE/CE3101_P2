@@ -326,3 +326,12 @@ GROUP BY
     p.id_plan_trabajo, p.id_cliente,
     nombre_cliente, nombre_instructor,
     p.start_date, p.end_date, p.descripcion;
+
+-- sucursal_tratamiento_view
+CREATE OR REPLACE VIEW sucursal_tratamiento_view AS
+SELECT
+  st.id_sucursal,
+  st.id_tratamiento,
+  t.nombre_tratamiento
+FROM sucursalxtratamiento st
+JOIN tratamiento t ON st.id_tratamiento = t.id_tratamiento;

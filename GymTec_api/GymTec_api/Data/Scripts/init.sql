@@ -250,6 +250,8 @@ ALTER TABLE telefonossucursal
 
 
 -- Vistas
+
+-- clases_disponibles
 CREATE OR REPLACE VIEW clases_disponibles AS
 SELECT
     s.descripcion AS nombre_servicio,
@@ -276,3 +278,19 @@ GROUP BY
     c.hora_inicio, 
     c.hora_fin, 
     c.fecha;
+
+-- empleados_sucursal
+CREATE OR REPLACE VIEW empleados_sucursal AS
+SELECT
+    su.id_sucursal,
+    su.nombre_sucursal,
+    e.cedula,
+    CONCAT(e.nombres, ' ', e.apellidos)       AS nombre_completo,
+    e.correo,
+    pu.descripcion                            AS puesto,
+    pl.descripcion                            AS tipo_planilla,
+    e.clases_horas
+FROM empleado   e
+JOIN sucursal   su ON su.id_sucursal = e.id_sucursal
+JOIN puesto     pu ON pu.id_puesto   = e.id_puesto
+JOIN planilla   pl ON pl.id_planilla = e.id_planilla;

@@ -35,7 +35,28 @@ namespace GymTec_api.Controllers
         }
 
         // GET : api/empleado/{id_sucursal}
-        // VISTA
+        [HttpGet("{id_sucursal}")]
+        public IActionResult GetEmpleadoSucursal(int id_sucursal)
+        {
+            try
+            {
+                var empleadosSucursal = _context.empleados_sucursal
+                    .Where(e => e.id_sucursal == id_sucursal) 
+                    .ToList();
+
+                if (empleadosSucursal == null || empleadosSucursal.Count == 0)
+                {
+                    return NotFound(new { success = false, error = "No hay empleados para esta sucursal." });
+                }
+
+                return Ok(new { success = true, data = empleadosSucursal });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
+        }
+
 
         // POST : api/empleado
         [HttpPost]

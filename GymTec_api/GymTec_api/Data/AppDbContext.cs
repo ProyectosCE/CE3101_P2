@@ -32,6 +32,7 @@ namespace GymTec_api.Data
 
         // Vistas
         public DbSet<ClaseDisponible> clases_disponibles { get; set; }
+        public DbSet<EmpleadoSucursal> empleados_sucursal { get; set; }
 
         // DTOs
         public DbSet<PlanillaEmpleadoDTO> planillaEmpleadoDTO { get; set; } 
@@ -184,6 +185,11 @@ namespace GymTec_api.Data
             modelBuilder.Entity<ClaseDisponible>()
                 .HasNoKey()
                 .ToView("clases_disponibles");
+
+            // empleado_sucursal
+            modelBuilder.Entity<EmpleadoSucursal>()
+                .HasNoKey()
+                .ToView("empleados_sucursal");
 
             //====================== DTOs =======================
             modelBuilder.Entity<PlanillaEmpleadoDTO>().HasNoKey();

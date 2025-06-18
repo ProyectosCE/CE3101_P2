@@ -1,4 +1,4 @@
-
+﻿
 -- Creacion de tablas
 
 CREATE TABLE clase (
@@ -294,3 +294,35 @@ FROM empleado   e
 JOIN sucursal   su ON su.id_sucursal = e.id_sucursal
 JOIN puesto     pu ON pu.id_puesto   = e.id_puesto
 JOIN planilla   pl ON pl.id_planilla = e.id_planilla;
+
+
+
+-- plantrabajo_cliente
+CREATE OR REPLACE VIEW plantrabajo_cliente AS
+SELECT
+    p.id_plan_trabajo,
+    p.id_cliente,  -- ← necesario para filtrar luego
+    CONCAT(c.nombres, ' ', c.apellidos)  AS nombre_cliente,
+    CONCAT(i.nombres, ' ', i.apellidos)  AS nombre_instructor,
+    p.start_date,
+    p.end_date,
+    p.descripcion,
+    COALESCE(
+        json_agg(
+            json_build_object(
+                'id_detalle_plan', d.id_detalle_plan,
+                'fecha',           d.fecha,
+                'actividad',       d.actividad
+            )
+            ORDER BY d.fecha                                 
+        ) FILTER (WHERE d.id_detalle_plan IS NOT NULL),
+        '[]'::json
+    ) AS detalles
+FROM plantrabajo p
+JOIN cliente  c  ON c.id_cliente   = p.id_cliente
+LEFT JOIN empleado i ON i.id_empleado = c.id_instructor
+LEFT JOIN detalleplan d ON d.id_plan_trabajo = p.id_plan_trabajo
+GROUP BY
+    p.id_plan_trabajo, p.id_cliente,
+    nombre_cliente, nombre_instructor,
+    p.start_date, p.end_date, p.descripcion;

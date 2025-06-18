@@ -2,6 +2,8 @@
 using GymTec_api.Models;
 using GymTec_api.Models.Vistas;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System.Text.Json;
 
 namespace GymTec_api.Data
 {
@@ -13,8 +15,8 @@ namespace GymTec_api.Data
         // DbSets para los modelos
         public DbSet<Clase> clase { get; set; }
         public DbSet<Cliente> cliente { get; set; }
-        public DbSet<ClienteXClase> clienteXClase { get; set; }
-        public DbSet<DetallePlan> detallePlan { get; set; }
+        public DbSet<ClienteXClase> clientexclase { get; set; }
+        public DbSet<DetallePlan> detalleplan { get; set; }
         public DbSet<Empleado> empleado { get; set; }
         public DbSet<Maquina> maquina { get; set; }
         public DbSet<Planilla> planilla { get; set; }
@@ -33,6 +35,7 @@ namespace GymTec_api.Data
         // Vistas
         public DbSet<ClaseDisponible> clases_disponibles { get; set; }
         public DbSet<EmpleadoSucursal> empleados_sucursal { get; set; }
+        public DbSet<PlanTrabajoCliente> plantrabajo_cliente { get; set; }
 
         // DTOs
         public DbSet<PlanillaEmpleadoDTO> planillaEmpleadoDTO { get; set; } 
@@ -190,6 +193,19 @@ namespace GymTec_api.Data
             modelBuilder.Entity<EmpleadoSucursal>()
                 .HasNoKey()
                 .ToView("empleados_sucursal");
+
+            // plantrabajo_cliente
+            modelBuilder.Entity<PlanTrabajoCliente>()
+                .HasNoKey()
+                .ToView("plantrabajo_cliente");
+            var detallesConverter = new ValueConverter<List<DetallePlanVista>, string>(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                    v => JsonSerializer.Deserialize<List<DetallePlanVista>>(v, (JsonSerializerOptions)null)
+             ); 
+
+            modelBuilder.Entity<PlanTrabajoCliente>()
+                .Property(p => p.detalles)
+                .HasConversion(detallesConverter);
 
             //====================== DTOs =======================
             modelBuilder.Entity<PlanillaEmpleadoDTO>().HasNoKey();

@@ -152,6 +152,11 @@ namespace GymTec_api.Controllers
         [HttpDelete("api/sucursal/{id_sucursal}")]
         public IActionResult Delete(int id_sucursal)
         {
+            var sucursal = _context.sucursal.Find(id_sucursal);
+            if (sucursal == null)
+            {
+                return NotFound(new { success = false, error = "Sucursal no encontrada." });
+            }
             try
             {
                 _context.Database.ExecuteSqlRaw("CALL eliminar_sucursal_completa({0})", id_sucursal);

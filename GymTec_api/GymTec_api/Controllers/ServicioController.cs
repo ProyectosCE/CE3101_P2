@@ -96,6 +96,11 @@ namespace GymTec_api.Controllers
         [HttpDelete("{id_servicio}")]
         public IActionResult DeleteServicio(int id_servicio)
         {
+            var servicioExistente = _context.servicio.Find(id_servicio);
+            if (servicioExistente == null)
+            {
+                return NotFound(new { success = false, error = "Servicio no encontrado." });
+            }
             try
             {
                 _context.Database.ExecuteSqlRaw("CALL eliminar_servicio({0})", id_servicio);

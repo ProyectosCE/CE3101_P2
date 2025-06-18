@@ -130,22 +130,19 @@ namespace GymTec_api.Controllers
         [HttpDelete("{id_tratamiento}")]
         public IActionResult DeleteTratamiento(int id_tratamiento)
         {
+            var tratamientoExistente = _context.tratamiento.Find(id_tratamiento);
+            if (tratamientoExistente == null)
+            {
+                return NotFound(new{success = false,error = "Tratamiento no encontrado."});
+            }
             try
             {
                 _context.Database.ExecuteSqlRaw("CALL eliminar_tratamiento({0})", id_tratamiento);
-                return Ok(new
-                {
-                    success = true,
-                    mensaje = "Tratamiento eliminado correctamente."
-                });
+                return Ok(new{success = true,mensaje = "Tratamiento eliminado correctamente."});
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    error = ex.Message
-                });
+                return StatusCode(500, new{success = false,error = ex.Message});
             }
         }
     }

@@ -104,6 +104,11 @@ namespace GymTec_api.Controllers
         [HttpDelete("{id_clase}")]
         public IActionResult DeleteClase(int id_clase)
         {
+            var clase = _context.clase.Find(id_clase);
+            if (clase == null)
+            {
+                return NotFound(new { success = false, error = "Clase no encontrada." });
+            }
             try
             {
                 _context.Database.ExecuteSqlRaw("CALL eliminar_clase({0})", id_clase);

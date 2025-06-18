@@ -111,6 +111,11 @@ namespace GymTec_api.Controllers
         [HttpDelete("{id_cliente}")]
         public IActionResult DeleteCliente(int id_cliente)
         {
+            var cliente = _context.cliente.Find(id_cliente);
+            if (cliente == null)
+            {
+                return NotFound(new { success = false, error = "Cliente no encontrado." });
+            }
             try
             {
                 _context.Database.ExecuteSqlRaw("CALL eliminar_cliente({0})", id_cliente);

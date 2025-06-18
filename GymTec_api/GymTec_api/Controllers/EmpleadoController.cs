@@ -132,6 +132,12 @@ namespace GymTec_api.Controllers
         [HttpDelete("{id_empleado}")]
         public IActionResult DeleteEmpleado(int id_empleado)
         {
+            var empleado = _context.empleado.Find(id_empleado);
+            if (empleado == null)
+            {
+                return NotFound(new { success = false, error = "Empleado no encontrado." });
+            }
+
             try
             {
                 _context.Database.ExecuteSqlRaw("CALL eliminar_empleado({0})", id_empleado);

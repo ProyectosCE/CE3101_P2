@@ -109,6 +109,10 @@ namespace GymTec_api.Controllers
         [HttpDelete("{id_detalle_plan}")]
         public IActionResult DeleteDetallePlan(int id_detalle_plan)
         {
+            if (id_detalle_plan <= 0)
+            {
+                return BadRequest(new { success = false, error = "ID de detalle de plan no válido." });
+            }
             var detallePlan = _context.detalleplan.Find(id_detalle_plan);
             if (detallePlan == null)
             {

@@ -93,6 +93,11 @@ namespace GymTec_api.Controllers
         [HttpDelete("{id_planilla}")]
         public IActionResult DeletePlanilla(int id_planilla)
         {
+            var planillaExistente = _context.planilla.Find(id_planilla);
+            if (planillaExistente == null)
+            {
+                return NotFound(new { success = false, error = "Planilla no encontrada." });
+            }
             try
             {
                 _context.Database.ExecuteSqlRaw("CALL eliminar_planilla({0})", id_planilla);

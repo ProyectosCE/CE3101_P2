@@ -100,12 +100,8 @@ namespace GymTec_api.Controllers
             _context.tipo_equipo.Remove(tipoEquipo);
             try
             {
-                _context.SaveChanges();
+                _context.Database.ExecuteSqlRaw("CALL eliminar_tipo_equipo({0})", id_tipo_equipo);
                 return Ok(new { success = true, mensaje = "Tipo de equipo eliminado correctamente." });
-            }
-            catch (DbUpdateException dbEx)
-            {
-                return BadRequest(new { success = false, error = dbEx.InnerException?.Message ?? dbEx.Message });
             }
             catch (Exception ex)
             {

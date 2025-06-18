@@ -270,6 +270,19 @@ BEGIN
 END;
 $$;
 
+-- Eliminar TipoEquipo
+CREATE OR REPLACE PROCEDURE eliminar_tipo_equipo(tipo_equipo_id INT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Eliminar maquinas asociadas a este tipo de equipo
+    DELETE FROM maquina
+    WHERE id_tipo_equipo = tipo_equipo_id;
+    -- Eliminar el tipo de equipo
+    DELETE FROM tipo_equipo
+    WHERE id_tipo_equipo = tipo_equipo_id;
+END;
+
 /*
     =========================================================
                        Generar Planilla

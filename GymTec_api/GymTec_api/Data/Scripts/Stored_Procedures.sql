@@ -282,6 +282,7 @@ BEGIN
     DELETE FROM tipo_equipo
     WHERE id_tipo_equipo = tipo_equipo_id;
 END;
+$$;
 
 /*
     =========================================================

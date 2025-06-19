@@ -357,3 +357,16 @@ SELECT
   FROM sucursalxservicio ss
   JOIN servicio s ON ss.id_servicio = s.id_servicio
   JOIN sucursal su ON ss.id_sucursal = su.id_sucursal;
+
+-- cliente_clase_view
+CREATE OR REPLACE VIEW cliente_clase_view AS
+SELECT
+  cc.id_cliente,
+  cc.id_clase,
+  s.descripcion AS nombre_clase,
+  cl.cedula,
+  CONCAT(cl.nombres, ' ', cl.apellidos) AS nombre_cliente
+FROM clientexclase cc
+JOIN clase c ON cc.id_clase = c.id_clase
+JOIN servicio s ON c.id_servicio = s.id_servicio
+JOIN cliente cl ON cc.id_cliente = cl.id_cliente;

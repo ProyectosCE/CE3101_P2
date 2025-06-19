@@ -346,3 +346,14 @@ SELECT
   p.costo
 FROM sucursalxproducto sp
 JOIN producto p ON sp.codigo_barra = p.codigo_barra;
+
+-- sucursal_servicio_view
+CREATE OR REPLACE VIEW sucursal_servicio_view AS
+SELECT
+  ss.id_sucursal,
+  ss.id_servicio,
+  s.descripcion AS nombre_servicio,
+  su.nombre_sucursal
+  FROM sucursalxservicio ss
+  JOIN servicio s ON ss.id_servicio = s.id_servicio
+  JOIN sucursal su ON ss.id_sucursal = su.id_sucursal;

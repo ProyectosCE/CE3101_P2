@@ -23,6 +23,7 @@ namespace GymTec_api.Models.Vistas
 
     public class DetallePlanVista
     {
+        public int id_detalle_plan { get; set; }
         public DateOnly fecha { get; set; }
         public string actividad { get; set; }
     }

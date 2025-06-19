@@ -69,11 +69,9 @@ $$;
 -- Copiar actividades de una semana a otra
 
 CREATE OR REPLACE PROCEDURE copiar_actividades_semana(
-    p_id_plan_trabajo INT,
-    p_start_date      DATE,
-    p_end_date        DATE,
-    p_new_start_date  DATE,
-    p_new_end_date    DATE
+    p_id_plan_trabajo     INT,
+    p_start_monday        DATE,
+    p_new_start_monday    DATE
 )
 LANGUAGE plpgsql
 AS $$
@@ -82,53 +80,53 @@ DECLARE
     fecha_offset   INTERVAL;
     count_origen   INT;
     count_destino  INT;
+    p_end_date         DATE := p_start_monday     + 6;  -- domingo origen
+    p_new_end_date     DATE := p_new_start_monday + 6;  -- domingo destino
 BEGIN
-    -- Validar que los rangos sean lunes–domingo y de 7 días exactos 
-    IF EXTRACT(DOW FROM p_start_date)     != 1 OR EXTRACT(DOW FROM p_end_date)     != 0
-       OR EXTRACT(DOW FROM p_new_start_date) != 1 OR EXTRACT(DOW FROM p_new_end_date) != 0
-       OR p_end_date - p_start_date        != 6
-       OR p_new_end_date - p_new_start_date!= 6
-    THEN
-        RAISE EXCEPTION 'Los rangos deben ir de lunes a domingo y durar exactamente 7 días.';
+    -- 1. Validar que ambas fechas sean lunes 
+    IF EXTRACT(DOW FROM p_start_monday) != 1
+       OR EXTRACT(DOW FROM p_new_start_monday) != 1 THEN
+        RAISE EXCEPTION 'Ambas fechas deben ser lunes.';
     END IF;
 
-    -- ¿Hay actividades en la semana origen? */
+    -- 2. Verificar que haya actividades en la semana origen 
     SELECT COUNT(*) INTO count_origen
     FROM detalleplan
     WHERE id_plan_trabajo = p_id_plan_trabajo
-      AND fecha BETWEEN p_start_date AND p_end_date;
+      AND fecha BETWEEN p_start_monday AND p_end_date;
 
     IF count_origen = 0 THEN
         RAISE EXCEPTION 'La semana origen no tiene actividades; no hay nada que copiar.';
     END IF;
 
-    -- ¿La semana destino ya contiene actividades? 
+    -- 3. Verificar que la semana destino esté libre 
     SELECT COUNT(*) INTO count_destino
     FROM detalleplan
     WHERE id_plan_trabajo = p_id_plan_trabajo
-      AND fecha BETWEEN p_new_start_date AND p_new_end_date;
+      AND fecha BETWEEN p_new_start_monday AND p_new_end_date;
 
     IF count_destino > 0 THEN
-        RAISE EXCEPTION 'La semana destino ya tiene actividades; la copia ha sido cancelada.';
+        RAISE EXCEPTION 'La semana destino ya tiene actividades; copia cancelada.';
     END IF;
 
-    -- ▸ Copiar actividades día a día 
+    -- 4. Copiar actividades con desplazamiento de fecha 
     FOR actividad IN
         SELECT * FROM detalleplan
         WHERE id_plan_trabajo = p_id_plan_trabajo
-          AND fecha BETWEEN p_start_date AND p_end_date
+          AND fecha BETWEEN p_start_monday AND p_end_date
     LOOP
-        fecha_offset := actividad.fecha - p_start_date;
+        fecha_offset := actividad.fecha - p_start_monday;
 
         INSERT INTO detalleplan (fecha, actividad, id_plan_trabajo)
         VALUES (
-            p_new_start_date + fecha_offset,
+            p_new_start_monday + fecha_offset,
             actividad.actividad,
             p_id_plan_trabajo
         );
     END LOOP;
 END;
 $$;
+
 
 
 /*

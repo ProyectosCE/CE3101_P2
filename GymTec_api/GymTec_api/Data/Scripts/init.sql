@@ -335,3 +335,14 @@ SELECT
   t.nombre_tratamiento
 FROM sucursalxtratamiento st
 JOIN tratamiento t ON st.id_tratamiento = t.id_tratamiento;
+
+-- sucursal_producto_view
+CREATE OR REPLACE VIEW sucursal_producto_view AS
+SELECT
+  sp.id_sucursal,
+  sp.codigo_barra,
+  p.nombre,
+  p.descripcion,
+  p.costo
+FROM sucursalxproducto sp
+JOIN producto p ON sp.codigo_barra = p.codigo_barra;

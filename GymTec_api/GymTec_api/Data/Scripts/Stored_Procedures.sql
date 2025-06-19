@@ -188,19 +188,20 @@ END;
 $$;
 
 -- Eliminar productos
-CREATE OR REPLACE PROCEDURE eliminar_producto(codigo_barra TEXT)
+CREATE OR REPLACE PROCEDURE eliminar_producto(p_codigo_barra TEXT)
 LANGUAGE plpgsql
 AS $$
 BEGIN
     -- Eliminar relaciones en sucursalxproducto
     DELETE FROM sucursalxproducto
-    WHERE codigo_barra = codigo_barra;
+    WHERE codigo_barra = p_codigo_barra;
 
-    -- Eliminar producto en tabla producto
+    -- Eliminar producto
     DELETE FROM producto
-    WHERE codigo_barra = codigo_barra;
+    WHERE codigo_barra = p_codigo_barra;
 END;
 $$;
+
 
 -- Eliminar puestos
 CREATE OR REPLACE PROCEDURE eliminar_puesto(puesto_id INT)

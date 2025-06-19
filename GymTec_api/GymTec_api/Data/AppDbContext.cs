@@ -37,6 +37,7 @@ namespace GymTec_api.Data
         public DbSet<EmpleadoSucursal> empleados_sucursal { get; set; }
         public DbSet<PlanTrabajoCliente> plantrabajo_cliente { get; set; }
         public DbSet<SucursalTratamientoView> sucursal_tratamiento_view { get; set; }
+        public DbSet<SucursalProductoView> sucursal_producto_view { get; set; }
 
         // DTOs
         public DbSet<PlanillaEmpleadoDTO> planillaEmpleadoDTO { get; set; } 
@@ -212,6 +213,11 @@ namespace GymTec_api.Data
             modelBuilder.Entity<SucursalTratamientoView>()
                 .HasNoKey()
                 .ToView("sucursal_tratamiento_view");
+
+            // sucursal_producto_view
+            modelBuilder.Entity<SucursalProductoView>()
+                .HasNoKey()
+                .ToView("sucursal_producto_view");
 
             //====================== DTOs =======================
             modelBuilder.Entity<PlanillaEmpleadoDTO>().HasNoKey();

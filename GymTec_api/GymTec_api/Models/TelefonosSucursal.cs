@@ -9,7 +9,8 @@ namespace GymTec_api.Models
         //Atributos
         [Key]
         public int id_telefono_sucursal { get; set; }
-        public string telefono { get; set; }
+        public string numero_telefono { get; set; }
+
 
         //Fks
         public int id_sucursal { get; set; }

@@ -25,7 +25,9 @@ namespace GymTec_api.Controllers
         {
             try
             {
-                var sucursales = _context.sucursal.ToList();
+                var sucursales = _context.sucursal
+                    .Include(s => s.telefonos)
+                    .ToList();
                 return Ok(new { success = true, data = sucursales });
             }
             catch (Exception ex)

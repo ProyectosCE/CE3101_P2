@@ -25,6 +25,7 @@ namespace GymTec_api.Models
 
         // Fks
         public int? id_admin { get; set; }
+        [JsonIgnore]
         [ForeignKey("id_admin")]
         public Empleado? admin { get; set; }
 

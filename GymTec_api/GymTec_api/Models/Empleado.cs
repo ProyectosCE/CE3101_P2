@@ -33,14 +33,17 @@ namespace GymTec_api.Models
 
         // Fks
         public int id_planilla { get; set; }
+        [JsonIgnore]
         [ForeignKey("id_planilla")]
         public Planilla? planilla { get; set; }
 
         public int? id_sucursal { get; set; }
+        [JsonIgnore]
         [ForeignKey("id_sucursal")]
         public Sucursal? sucursal { get; set; }
 
         public int id_puesto { get; set; }
+        [JsonIgnore]
         [ForeignKey("id_puesto")]
         public Puesto? puesto { get; set; }
 

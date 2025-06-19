@@ -14,6 +14,7 @@ namespace GymTec_api.Models
 
         // Fks
         public int id_plan_trabajo { get; set; }
+        [JsonIgnore]
         [ForeignKey("id_plan_trabajo")]
         public PlanTrabajo? plan_trabajo { get; set; }
     }

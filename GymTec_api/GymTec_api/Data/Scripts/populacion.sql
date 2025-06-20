@@ -36,10 +36,3 @@ INSERT INTO tipo_equipo (descripcion) VALUES
 ('Multigimnasios'),
 ('Remos'),
 ('Pesas');
-
--- Productos
-INSERT INTO producto (codigo_barra, nombre, descripcion, costo) VALUES
-('PROD001', 'Proteína en polvo', 'Suplemento de proteína en polvo', 25000.00),
-('PROD002', 'Creatina', 'Suplemento de creatina', 15000.00),
-('PROD003', 'Aminoácidos', 'Suplemento de aminoácidos', 20000.00),
-('PROD004', 'Barras energéticas', 'Barras energéticas para antes del ejercicio', 5000.00);

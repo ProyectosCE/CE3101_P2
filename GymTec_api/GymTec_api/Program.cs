@@ -4,6 +4,25 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+// Configurar Kestrel para solo HTTP
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5000); // Solo HTTP en puerto 5000
+});
+
+// En Program.cs
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowNginx", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
+// ...
+
 
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -21,9 +40,10 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    //app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
+app.UseCors("AllowNginx");
 
 app.UseAuthorization();
 

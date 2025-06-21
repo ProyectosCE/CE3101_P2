@@ -31,7 +31,7 @@ services:
       - gymtec_api
     networks:
       - backend
-    entrypoint: ["sh", "-c", "/init.sh"]
+    entrypoint: ["sh", "-c", "chmod +x /init.sh && /init.sh"]
 
   certbot:
     image: certbot/certbot

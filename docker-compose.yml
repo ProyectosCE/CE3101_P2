@@ -42,7 +42,7 @@ services:
       --agree-tos
       --no-eff-email
       -d apigymtec.itcrdev.xyz
-      -d pg_gymtec.itcrdev.xyz
+      -d gymtecpg.itcrdev.xyz
       -d nginxtest.itcrdev.xyz
       && echo 'Certificados generados correctamente'"
     depends_on:

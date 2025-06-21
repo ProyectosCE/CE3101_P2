@@ -1,3 +1,5 @@
+version: '3'
+
 services:
   gymtec_api:
     image: alexmonterov/gymtec_api:latest
@@ -19,14 +21,17 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./Docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./Docker/nginx/nginx_A.conf:/etc/nginx/nginx_A.conf:ro
+      - ./Docker/nginx/nginx_B.conf:/etc/nginx/nginx_B.conf:ro
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
       - ./Docker/certbot/www:/var/www/certbot
+      - ./Docker/init.sh:/init.sh:ro
     depends_on:
       - gymtec_api
     networks:
       - backend
+    entrypoint: ["sh", "-c", "/init.sh"]
 
   certbot:
     image: certbot/certbot
@@ -35,16 +40,7 @@ services:
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
       - ./Docker/certbot/www:/var/www/certbot
-    entrypoint: >
-      sh -c "certbot certonly --webroot
-      --webroot-path=/var/www/certbot
-      --email ale_montero@estudiantec.cr
-      --agree-tos
-      --no-eff-email
-      -d apigymtec.itcrdev.xyz
-      -d gymtecpg.itcrdev.xyz
-      -d nginxtest.itcrdev.xyz
-      && echo 'Certificados generados correctamente'"
+    entrypoint: ["sh", "-c", "echo 'Certbot no se ejecutará automáticamente, se ejecutará desde nginx'"]
     depends_on:
       - nginx
     networks:

@@ -3,7 +3,7 @@ services:
     image: ${DOCKER_REGISTRY-}gymtecapi
     build:
       context: .
-      dockerfile: GymTec_api/Dockerfile
+      dockerfile: /GymTec_api/GymTec_api/Dockerfile
     ports:
       - "5000:5000"
       - "5001:5001"
@@ -13,7 +13,7 @@ services:
     depends_on:
       - postgresdb
     networks:
-      - backend  # ← Agregar esta línea
+      - backend
 
   nginx:
     image: nginx:latest
@@ -22,7 +22,7 @@ services:
       - "8090:80"
       - "8091:81"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./Docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - gymtec_api
     networks:
@@ -40,8 +40,9 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./Docker/postgresql/init-db:/docker-entrypoint-initdb.d
     networks:
-      - backend  # ← Agregar esta línea
+      - backend
 
   pgadmin:
     image: dpage/pgadmin4:latest

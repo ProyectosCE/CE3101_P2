@@ -49,7 +49,7 @@ CREATE TRIGGER trg_deny_patch_default_servicio
     FOR EACH ROW EXECUTE FUNCTION deny_patch_defaults();
 
 
--- Validar que el id_instructor en cliente sea un instructor v·lido
+-- Validar que el id_instructor en cliente sea un instructor v√°lido
 CREATE OR REPLACE FUNCTION validate_instructor_cliente()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -62,7 +62,7 @@ BEGIN
         WHERE e.id_empleado = NEW.id_instructor;
 
         IF desc_puesto IS DISTINCT FROM 'instructor' THEN
-            RAISE EXCEPTION 'El id_instructor no corresponde a un instructor v·lido';
+            RAISE EXCEPTION 'El id_instructor no corresponde a un instructor v√°lido';
         END IF;
     END IF;
     RETURN NEW;
@@ -74,7 +74,7 @@ CREATE TRIGGER trg_validate_instructor_cliente
     FOR EACH ROW EXECUTE FUNCTION validate_instructor_cliente();
 
 
--- Validar que el id_instructor en clase sea un instructor v·lido
+-- Validar que el id_instructor en clase sea un instructor v√°lido
 CREATE OR REPLACE FUNCTION validate_instructor_clase()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -87,7 +87,7 @@ BEGIN
         WHERE e.id_empleado = NEW.id_instructor;
 
         IF desc_puesto IS DISTINCT FROM 'instructor' THEN
-            RAISE EXCEPTION 'El id_instructor en clase no es v·lido (no es un Instructor)';
+            RAISE EXCEPTION 'El id_instructor en clase no es v√°lido (no es un Instructor)';
         END IF;
     END IF;
 
@@ -105,7 +105,7 @@ CREATE TRIGGER trg_validate_instructor_clase_update
     FOR EACH ROW EXECUTE FUNCTION validate_instructor_clase();
 
 
--- Validar que el id_admin en sucursal sea un administrador v·lido
+-- Validar que el id_admin en sucursal sea un administrador v√°lido
 CREATE OR REPLACE FUNCTION validate_admin_sucursal()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -118,7 +118,7 @@ BEGIN
         WHERE e.id_empleado = NEW.id_admin;
 
         IF desc_puesto IS DISTINCT FROM 'admin' THEN
-            RAISE EXCEPTION 'El empleado no es un administrador v·lido';
+            RAISE EXCEPTION 'El empleado no es un administrador v√°lido';
         END IF;
     END IF;
     RETURN NEW;
@@ -151,14 +151,14 @@ BEGIN
             RAISE EXCEPTION 'Instructor sin sucursal asignada';
         END IF;
 
-        -- Validar que el servicio estÈ disponible en esa sucursal
+        -- Validar que el servicio est√° disponible en esa sucursal
         SELECT TRUE INTO existe
         FROM sucursalxservicio
         WHERE id_sucursal = id_sucursal_instructor
           AND id_servicio = NEW.id_servicio;
 
         IF NOT FOUND THEN
-            RAISE EXCEPTION 'El servicio no est· disponible en la sucursal del instructor';
+            RAISE EXCEPTION 'El servicio no est√° disponible en la sucursal del instructor';
         END IF;
     END IF;
 

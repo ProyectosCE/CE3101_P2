@@ -6,7 +6,7 @@ INSERT INTO tratamiento (nombre_tratamiento, is_default) VALUES
 ('Masaje relajante', TRUE),
 ('Masaje descarga muscular', TRUE),
 ('Sauna', TRUE),
-('BaÒos a vapor', TRUE);
+('Ba√±os a vapor', TRUE);
 
 -- Puesto
 INSERT INTO puesto (descripcion, is_default) VALUES
@@ -27,7 +27,7 @@ INSERT INTO servicio (descripcion, is_default) VALUES
 ('Pilates',TRUE),
 ('Yoga',TRUE),
 ('Zumba',TRUE),
-('NataciÛn',TRUE)
+('Nataci√≥n',TRUE);
 
 -- Tipo_Equipo
 INSERT INTO tipo_equipo (descripcion) VALUES
@@ -39,32 +39,32 @@ INSERT INTO tipo_equipo (descripcion) VALUES
 
 -- Productos
 INSERT INTO producto (codigo_barra, nombre, descripcion, costo) VALUES
-('PROD001', 'ProteÌna en polvo', 'Suplemento de proteÌna en polvo', 25000.00),
+('PROD001', 'Prote√≠na en polvo', 'Suplemento de prote√≠na en polvo', 25000.00),
 ('PROD002', 'Creatina', 'Suplemento de creatina', 15000.00),
-('PROD003', 'Amino·cidos', 'Suplemento de amino·cidos', 20000.00),
-('PROD004', 'Barras energÈticas', 'Barras energÈticas para antes del ejercicio', 5000.00);
+('PROD003', 'Amino√°cidos', 'Suplemento de amino√°cidos', 20000.00),
+('PROD004', 'Barras energ√©ticas', 'Barras energ√©ticas para antes del ejercicio', 5000.00);
 
 
 -- Para Pruebas
 
 -- Cliente
 INSERT INTO cliente (cedula, peso, imc, correo, password, nombres, apellidos, fecha_nacimiento, distrito, canton, provincia) VALUES
-('111111111', 70.5, 22.5, 'cliente1@gym.com', 'clientepass', 'Jose Eduardo', 'Campos Salazar', '1990-05-15', 'San RamÛn', 'Alajuela', 'Alajuela'),
+('111111111', 70.5, 22.5, 'cliente1@gym.com', 'clientepass', 'Jose Eduardo', 'Campos Salazar', '1990-05-15', 'San Ram√≥n', 'Alajuela', 'Alajuela'),
 ('222222222', 65.0, 21.8, 'cliente2@gym.com', 'clientepass', 'Jimmy', 'Feng Feng', '1988-09-10', 'Oriental', 'Cartago', 'Cartago'),
-('333333333', 70.5, 22.5, 'cliente3@gym.com', 'clientepass', 'Alexander', 'Montero', '1990-05-15', 'San RamÛn', 'Alajuela', 'Alajuela'),
+('333333333', 70.5, 22.5, 'cliente3@gym.com', 'clientepass', 'Alexander', 'Montero', '1990-05-15', 'San Ram√≥n', 'Alajuela', 'Alajuela'),
 ('444444444', 65.0, 21.8, 'cliente4@gym.com', 'clientepass', 'Jose Bernardo', 'Barquero', '1988-09-10', 'Oriental', 'Cartago', 'Cartago'),
-('555555555', 70.5, 22.5, 'cliente5@gym.com', 'clientepass', 'Diego', 'Salas', '1990-05-15', 'San RamÛn', 'Alajuela', 'Alajuela'),
-('666666666', 65.0, 21.8, 'cliente6@gym.com', 'clientepass', 'Adrian', 'MuÒÛz', '1988-09-10', 'Oriental', 'Cartago', 'Cartago');
+('555555555', 70.5, 22.5, 'cliente5@gym.com', 'clientepass', 'Diego', 'Salas', '1990-05-15', 'San Ram√≥n', 'Alajuela', 'Alajuela'),
+('666666666', 65.0, 21.8, 'cliente6@gym.com', 'clientepass', 'Adrian', 'Mu√±√≥z', '1988-09-10', 'Oriental', 'Cartago', 'Cartago');
 
 -- Empleado Admin 
 INSERT INTO empleado (cedula, salario, correo, password, clases_horas, nombres, apellidos, distrito, canton, provincia, id_planilla, id_puesto) VALUES
-('101010101', 800000.00, 'admin@gym.com', 'adminpass', 0, 'Carlos', 'Guzm·n', 'Carmen', 'San JosÈ', 'San JosÈ', 1, 1), --Admin
+('101010101', 800000.00, 'admin@gym.com', 'adminpass', 0, 'Carlos', 'Guzm√°n', 'Carmen', 'San Jos√©', 'San Jos√©', 1, 1), --Admin
 ('202020202', 800000.00, 'admin2@gym.com', 'adminpass', 0, 'Adriana', 'Lima', 'Occidental', 'Cartago', 'Cartago', 1, 1);   -- Admin
 
 -- Surcursal
 INSERT INTO sucursal (nombre_sucursal, fecha_apertura, horario_atencion, capacidad_max, distrito, canton, provincia, id_admin) 
 VALUES 
-('Sucursal Central', '2020-01-01', '06:00 - 22:00', 100, 'Carmen', 'San JosÈ', 'San JosÈ', 1),
+('Sucursal Central', '2020-01-01', '06:00 - 22:00', 100, 'Carmen', 'San Jos√©', 'San Jos√©', 1),
 ('Sucursal Secundaria', '2021-01-01', '06:00 - 22:00', 100, 'Oriental', 'Cartago', 'Cartago', 2); 
 
 UPDATE empleado SET id_sucursal = 1 WHERE cedula = '101010101'; -- Asignar admin a la sucursal
@@ -72,9 +72,9 @@ UPDATE empleado SET id_sucursal = 2 WHERE cedula = '202020202'; -- Asignar admin
 
 -- Empleado (Instructor)
 INSERT INTO empleado (cedula, salario, correo, password, clases_horas, nombres, apellidos, distrito, canton, provincia, id_planilla, id_puesto, id_sucursal) VALUES
-('303030303', 500000.00, 'instructor@gym.com', 'instpass', 20, 'MarÌa', 'Lopez', 'Hatillo', 'San JosÈ', 'San JosÈ', 2, 2, 1), -- Instructor
+('303030303', 500000.00, 'instructor@gym.com', 'instpass', 20, 'Mar√≠a', 'Lopez', 'Hatillo', 'San Jos√©', 'San Jos√©', 2, 2, 1), -- Instructor
 ('404040404', 600000.00, 'isntructor2@gym.com', 'instpass', 4, 'Luis', 'Fernandez', 'Oriental', 'Cartago', 'Cartago', 3, 2, 1),  --Instructor
-('505050505', 500000.00, 'instructor3@gym.com', 'instpass', 20, 'MarÌa', 'Lopez', 'Hatillo', 'San JosÈ', 'San JosÈ', 2, 2, 2), -- Instructor
+('505050505', 500000.00, 'instructor3@gym.com', 'instpass', 20, 'Mar√≠a', 'Lopez', 'Hatillo', 'San Jos√©', 'San Jos√©', 2, 2, 2), -- Instructor
 ('606060606', 600000.00, 'isntructor4@gym.com', 'instpass', 4, 'Luis', 'Fernandez', 'Oriental', 'Cartago', 'Cartago', 3, 2, 2);  --Instructor
 
 -- SucursalXServicio
@@ -83,14 +83,14 @@ INSERT INTO sucursalxservicio (id_sucursal, id_servicio) VALUES
 (1, 2), -- Sucursal Central ofrece Pilates
 (1, 3), -- Sucursal Central ofrece Yoga
 (1, 4), -- Sucursal Central ofrece Zumba
-(1, 5), -- Sucursal Central ofrece NataciÛn
+(1, 5), -- Sucursal Central ofrece Nataci√≥n
 (1, 6), -- Sucursal Central ofrece Tienda de suplementos
 
 (2, 1), -- Sucursal Secundaria ofrece Indoor Cycling
 (2, 2), -- Sucursal Secundaria ofrece Pilates
 (2, 3), -- Sucursal Secundaria ofrece Yoga
 (2, 4), -- Sucursal Secundaria ofrece Zumba
-(2, 5), -- Sucursal Secundaria ofrece NataciÛn
+(2, 5), -- Sucursal Secundaria ofrece Nataci√≥n
 (2, 6); -- Sucursal Secundaria ofrece Tienda de suplementos
 
 -- SucursalXTratamiento
@@ -98,24 +98,24 @@ INSERT INTO sucursalxtratamiento (id_sucursal, id_tratamiento) VALUES
 (1, 1), -- Sucursal Central ofrece Masaje relajante
 (1, 2), -- Sucursal Central ofrece Masaje descarga muscular
 (1, 3), -- Sucursal Central ofrece Sauna
-(1, 4), -- Sucursal Central ofrece BaÒos a vapor
+(1, 4), -- Sucursal Central ofrece Ba√±os a vapor
 
 (2, 1), -- Sucursal Secundaria ofrece Masaje relajante
 (2, 2), -- Sucursal Secundaria ofrece Masaje descarga muscular
 (2, 3), -- Sucursal Secundaria ofrece Sauna
-(2, 4); -- Sucursal Secundaria ofrece BaÒos a vapor
+(2, 4); -- Sucursal Secundaria ofrece Ba√±os a vapor
 
 -- SucursalXProducto
 INSERT INTO sucursalxproducto (id_sucursal, codigo_barra) VALUES
-(1, 'PROD001'), -- Sucursal Central ofrece ProteÌna en polvo
+(1, 'PROD001'), -- Sucursal Central ofrece Prote√≠na en polvo
 (1, 'PROD002'), -- Sucursal Central ofrece Creatina
-(1, 'PROD003'), -- Sucursal Central ofrece Amino·cidos
-(1, 'PROD004'), -- Sucursal Central ofrece Barras energÈticas
+(1, 'PROD003'), -- Sucursal Central ofrece Amino√°cidos
+(1, 'PROD004'), -- Sucursal Central ofrece Barras energ√©ticas
 
-(2, 'PROD001'), -- Sucursal Secundaria ofrece ProteÌna en polvo
+(2, 'PROD001'), -- Sucursal Secundaria ofrece Prote√≠na en polvo
 (2, 'PROD002'), -- Sucursal Secundaria ofrece Creatina
-(2, 'PROD003'), -- Sucursal Secundaria ofrece Amino·cidos
-(2, 'PROD004'); -- Sucursal Secundaria ofrece Barras energÈticas
+(2, 'PROD003'), -- Sucursal Secundaria ofrece Amino√°cidos
+(2, 'PROD004'); -- Sucursal Secundaria ofrece Barras energ√©ticas
 
 -- TelefonsSucursal
 INSERT INTO telefonossucursal (numero_telefono, id_sucursal) VALUES
@@ -167,7 +167,7 @@ INSERT INTO maquina (marca, num_serie, costo, id_tipo_equipo, id_sucursal) VALUE
 -- ===============Sucursal para eliminar===================
 
 INSERT INTO empleado (cedula, salario, correo, password, clases_horas, nombres, apellidos, distrito, canton, provincia, id_planilla, id_puesto) VALUES
-('707070707', 800000.00, 'admin3@gym.com', 'adminpass', 0, 'Alberto', 'Chinchilla', 'Santa Ana', 'San JosÈ', 'San JosÈ', 1, 1);
+('707070707', 800000.00, 'admin3@gym.com', 'adminpass', 0, 'Alberto', 'Chinchilla', 'Santa Ana', 'San Jos√©', 'San Jos√©', 1, 1);
 
 
 -- Surcursal
@@ -179,7 +179,7 @@ UPDATE empleado SET id_sucursal = 3 WHERE cedula = '707070707'; -- Asignar admin
 
 -- Empleado (Instructor)
 INSERT INTO empleado (cedula, salario, correo, password, clases_horas, nombres, apellidos, distrito, canton, provincia, id_planilla, id_puesto, id_sucursal) VALUES
-('808080808', 500000.00, 'instructor8@gym.com', 'instpass', 20, 'inst8', 'Lopez', 'Hatillo', 'San JosÈ', 'San JosÈ', 2, 2, 3), -- Instructor
+('808080808', 500000.00, 'instructor8@gym.com', 'instpass', 20, 'inst8', 'Lopez', 'Hatillo', 'San Jos√©', 'San Jos√©', 2, 2, 3), -- Instructor
 ('909090909', 600000.00, 'isntructor9@gym.com', 'instpass', 4, 'inst9', 'Fernandez', 'Oriental', 'Cartago', 'Cartago', 3, 2, 3);  --Instructor
 
 -- SucursalXServicio
@@ -188,7 +188,7 @@ INSERT INTO sucursalxservicio (id_sucursal, id_servicio) VALUES
 (3, 2), -- Sucursal Central ofrece Pilates
 (3, 3), -- Sucursal Central ofrece Yoga
 (3, 4), -- Sucursal Central ofrece Zumba
-(3, 5), -- Sucursal Central ofrece NataciÛn
+(3, 5), -- Sucursal Central ofrece Nataci√≥n
 (3, 6); -- Sucursal Central ofrece Tienda de suplementos
 
 -- SucursalXTratamiento
@@ -196,14 +196,14 @@ INSERT INTO sucursalxtratamiento (id_sucursal, id_tratamiento) VALUES
 (3, 1), -- Sucursal Central ofrece Masaje relajante
 (3, 2), -- Sucursal Central ofrece Masaje descarga muscular
 (3, 3), -- Sucursal Central ofrece Sauna
-(3, 4); -- Sucursal Central ofrece BaÒos a vapor
+(3, 4); -- Sucursal Central ofrece Ba√±os a vapor
 
 -- SucursalXProducto
 INSERT INTO sucursalxproducto (id_sucursal, codigo_barra) VALUES
-(3, 'PROD001'), -- Sucursal Central ofrece ProteÌna en polvo
+(3, 'PROD001'), -- Sucursal Central ofrece Prote√≠na en polvo
 (3, 'PROD002'), -- Sucursal Central ofrece Creatina
-(3, 'PROD003'), -- Sucursal Central ofrece Amino·cidos
-(3, 'PROD004'); -- Sucursal Central ofrece Barras energÈticas
+(3, 'PROD003'), -- Sucursal Central ofrece Amino√°cidos
+(3, 'PROD004'); -- Sucursal Central ofrece Barras energ√©ticas
 
 
 -- TelefonsSucursal

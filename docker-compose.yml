@@ -19,28 +19,9 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./Docker/nginx/nginx_A.conf:/etc/nginx/nginx_A.conf
-      - ./Docker/nginx/nginx_B.conf:/etc/nginx/nginx_B.conf
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
-      - ./Docker/certbot/www:/var/www/certbot
-      - ./Docker/init.sh:/init.sh
+      - ./Docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - gymtec_api
-    networks:
-      - backend
-    entrypoint: ["sh", "-c", "chmod +x /init.sh && /init.sh"]
-
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    volumes:
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
-      - ./Docker/certbot/www:/var/www/certbot
-    entrypoint: ["sh", "-c", "echo 'Certbot no se ejecutará automáticamente, se ejecutará desde nginx'"]
-    depends_on:
-      - nginx
     networks:
       - backend
 
@@ -80,7 +61,5 @@ networks:
     driver: bridge
 
 volumes:
-  certbot-etc:
-  certbot-var:
   postgres_data:
   pgadmin_data:

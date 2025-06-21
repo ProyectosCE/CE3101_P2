@@ -1,11 +1,10 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["GymTec_api/GymTec_api.csproj", "GymTec_api/"]
-RUN dotnet restore "GymTec_api/GymTec_api.csproj"
+COPY ["GymTec_api/GymTec_api/GymTec_api.csproj", "GymTec_api/GymTec_api/"]
+RUN dotnet restore "GymTec_api/GymTec_api/GymTec_api.csproj"
 COPY . .
-WORKDIR "/src/GymTec_api"
+WORKDIR "/src/GymTec_api/GymTec_api"
 RUN dotnet publish -c Release -o /app/publish
-
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .

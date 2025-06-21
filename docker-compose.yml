@@ -1,0 +1,68 @@
+services:
+  gymtec_api:
+    image: ${DOCKER_REGISTRY-}gymtecapi
+    build:
+      context: .
+      dockerfile: /GymTec_api/GymTec_api/Dockerfile
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+    depends_on:
+      - postgresdb
+    networks:
+      - backend
+
+  nginx:
+    image: nginx:latest
+    container_name: gymtec_nginx
+    ports:
+      - "8090:80"
+      - "8091:81"
+    volumes:
+      - ./Docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - gymtec_api
+    networks:
+      - backend
+
+  postgresdb:
+    image: postgres:latest
+    container_name: gymtec_db
+    restart: always
+    environment:
+      POSTGRES_DB: gymtec_db
+      POSTGRES_USER: gymtec
+      POSTGRES_PASSWORD: gymtec
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./Docker/postgresql/init-db:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: gymtec@gmail.com
+      PGADMIN_DEFAULT_USERNAME: gymtec
+      PGADMIN_DEFAULT_PASSWORD: gymtec
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  pgadmin_data:

@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   gymtec_api:
     image: alexmonterov/gymtec_api:latest

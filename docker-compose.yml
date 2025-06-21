@@ -19,12 +19,12 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./Docker/nginx/nginx_A.conf:/etc/nginx/nginx_A.conf:ro
-      - ./Docker/nginx/nginx_B.conf:/etc/nginx/nginx_B.conf:ro
+      - ./Docker/nginx/nginx_A.conf:/etc/nginx/nginx_A.conf
+      - ./Docker/nginx/nginx_B.conf:/etc/nginx/nginx_B.conf
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
       - ./Docker/certbot/www:/var/www/certbot
-      - ./Docker/init.sh:/init.sh:ro
+      - ./Docker/init.sh:/init.sh
     depends_on:
       - gymtec_api
     networks:

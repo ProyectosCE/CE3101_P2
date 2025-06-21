@@ -1,9 +1,6 @@
 services:
   gymtec_api:
-    image: ${DOCKER_REGISTRY-}gymtecapi
-    build:
-      context: .
-      dockerfile: /GymTec_api/GymTec_api/Dockerfile
+    image: alexmonterov/gymtec_api:latest
     ports:
       - "5000:5000"
       - "5001:5001"

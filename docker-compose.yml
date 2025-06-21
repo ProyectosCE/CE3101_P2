@@ -52,6 +52,9 @@ services:
       PGADMIN_DEFAULT_EMAIL: gymtec@gmail.com
       PGADMIN_DEFAULT_USERNAME: gymtec
       PGADMIN_DEFAULT_PASSWORD: gymtec
+      SCRIPT_NAME: /
+      PGLADMIN_CONFIG_PROXY_X_HOST_COUNT: 1
+      PGLADMIN_CONFIG_PROXY_X_PREFIX_COUNT: 1
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     networks:

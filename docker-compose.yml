@@ -11,15 +11,17 @@ services:
       - postgresdb
     networks:
       - backend
+    env_file:
+      - Docker/env.production
 
   postgresdb:
     image: postgres:latest
     container_name: gymtec_db
     restart: always
     environment:
-      POSTGRES_DB: gymtec_db
-      POSTGRES_USER: gymtec
-      POSTGRES_PASSWORD: gymtec
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -27,6 +29,8 @@ services:
       - ./Docker/postgresql/init-db:/docker-entrypoint-initdb.d
     networks:
       - backend
+    env_file:
+      - Docker/env.production
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -35,15 +39,17 @@ services:
     ports:
       - "8081:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: gymtec@gmail.com
-      PGADMIN_DEFAULT_USERNAME: gymtec
-      PGADMIN_DEFAULT_PASSWORD: gymtec
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_USERNAME: ${PGADMIN_DEFAULT_USERNAME}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     depends_on:
       -  postgresdb
     networks:
       - backend
+    env_file:
+      - Docker/env.production
 
   nginx:
       image: nginx:latest

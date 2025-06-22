@@ -17,7 +17,7 @@ services:
     networks:
       - backend
     env_file:
-      - ./Docker/.env.production
+      - path: ./Docker/.env.production
 
 
   postgresdb:
@@ -36,7 +36,7 @@ services:
     networks:
       - backend
     env_file:
-      - ./Docker/.env.production
+      - path: ./Docker/.env.production
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -55,7 +55,7 @@ services:
     networks:
       - backend
     env_file:
-      - ./Docker/.env.production
+      - path: ./Docker/.env.production
 
   nginx:
       image: nginx:latest

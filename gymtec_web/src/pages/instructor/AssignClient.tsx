@@ -1,4 +1,3 @@
-// src/pages/instructor/AssignClient.tsx
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
@@ -9,152 +8,270 @@ interface Cliente {
   cedula: string;
   nombres: string;
   apellidos: string;
-  correo: string;
-  id_instructor: number | null;
 }
 
-export default function AssignClientPage() {
+interface PlanTrabajo {
+  id_plan_trabajo: number;
+  id_cliente: number;
+  start_date: string;
+  end_date: string;
+  descripcion: string;
+  id_instructor: number;
+}
+
+export default function CreateWorkPlanPage() {
   const { user, logout } = useAuth();
   const router = useRouter();
-  const instructorId = user?.id_empleado ?? -1;
+  const instructorId = user?.id ?? -1;
 
-  const [clientes, setClientes] = useState<Cliente[]>([
-    {
-      id_cliente: 1,
-      cedula: '101010101',
-      nombres: 'Juan',
-      apellidos: 'Pérez',
-      correo: 'juan.perez@mail.com',
-      id_instructor: null,
-    },
-    {
-      id_cliente: 2,
-      cedula: '202020202',
-      nombres: 'María',
-      apellidos: 'López',
-      correo: 'maria.lopez@mail.com',
-      id_instructor: null,
-    },
-    {
-      id_cliente: 3,
-      cedula: '303030303',
-      nombres: 'Carlos',
-      apellidos: 'Martínez',
-      correo: 'carlos.mart@mail.com',
-      id_instructor: 7,
-    },
-    {
-      id_cliente: 4,
-      cedula: '404040404',
-      nombres: 'Ana',
-      apellidos: 'Gómez',
-      correo: 'ana.gomez@mail.com',
-      id_instructor: null,
-    },
-  ]);
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [idCliente, setIdCliente] = useState<number | ''>('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [descripcion, setDescripcion] = useState('');
+  const [createdPlans, setCreatedPlans] = useState<PlanTrabajo[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
-    // Si integras API, haz fetch aquí
-  }, []);
+    const fetchClientes = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/cliente`);
 
-  const asignarInstructor = (idCliente: number) => {
-    setClientes(prev =>
-      prev.map(c =>
-        c.id_cliente === idCliente
-          ? { ...c, id_instructor: instructorId }
-          : c
-      )
-    );
-    alert(`Instructor asignado al cliente con cédula ${
-      clientes.find(c => c.id_cliente === idCliente)?.cedula
-    }.`);
+        if (!res.ok) {
+          if (res.status === 401) {
+            logout();
+            router.push('/login');
+            return;
+          }
+          throw new Error(`Error ${res.status}: ${res.statusText}`);
+        }
+
+        const data = await res.json();
+
+        if (data.success) {
+          setClientes(data.data);
+        } else {
+          setError(data.error || 'Error al obtener clientes');
+        }
+      } catch (err) {
+        console.error('Error al obtener clientes:', err);
+        setError(err instanceof Error ? err.message : 'Error desconocido al obtener clientes');
+      }
+    };
+
+    fetchClientes();
+  }, [API_URL, logout, router]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (idCliente === '' || !startDate || !endDate) {
+      setError('Por favor, completa todos los campos obligatorios.');
+      return;
+    }
+
+    const nuevoPlan = {
+      id_cliente: idCliente,
+      start_date: startDate,
+      end_date: endDate,
+      descripcion,
+      id_instructor: instructorId,
+    };
+
+    try {
+      const res = await fetch(`${API_URL}/api/plantrabajo/${idCliente}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nuevoPlan),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+
+        switch (res.status) {
+          case 400:
+            throw new Error(errorData.error || 'Datos inválidos enviados al servidor');
+          case 401:
+            logout();
+            router.push('/login');
+            return;
+          case 404:
+            throw new Error(errorData.error || 'Recurso no encontrado');
+          case 500:
+            throw new Error(errorData.error || 'Error interno del servidor');
+          default:
+            throw new Error(errorData.error || `Error ${res.status}: ${res.statusText}`);
+        }
+      }
+
+      const data = await res.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Error al crear el plan');
+      }
+
+      setCreatedPlans(prev => [data.data, ...prev]);
+      setError(null);
+      alert('Plan creado correctamente.');
+
+      // Resetear formulario
+      setIdCliente('');
+      setStartDate('');
+      setEndDate('');
+      setDescripcion('');
+    } catch (error: any) {
+      console.error('Error al crear plan:', error);
+      setError(error.message);
+    }
   };
 
   return (
-    <div className={styles.pageContainer}>
-      {/* Logo */}
-      <div className={styles.logoContainer}>
-        <img src="/logo.png" alt="Logo GymTEC" className={styles.logoImage} />
-      </div>
-
-      {/* Botón “Inicio” */}
-      <button
-        className={styles.homeButton}
-        onClick={() => router.push('/instructor/Dashboard')}
-      >
-        <i className="fas fa-home"></i> Inicio
-      </button>
-
-      {/* Botón Cerrar Sesión */}
-      <button className={styles.logoutButton} onClick={() => logout()}>
-        <i className="fas fa-sign-out-alt"></i> Cerrar Sesión
-      </button>
-
-      <main className="container">
-        {/* Encabezado */}
-        <h2 className={styles.mainHeader}>
-          <i className="fas fa-user-plus"></i> Asignar Instructor a Cliente
-        </h2>
-        <p className={styles.subHeader}>
-          Asigna a los clientes que aún no tienen instructor
-        </p>
-
-        {/* Contenido en tarjeta */}
-        <div className={styles.contentCard}>
-          <h3>
-            <i className="fas fa-users"></i> Clientes Disponibles
-          </h3>
-          <div className="table-responsive">
-            <table className="table table-hover mt-3">
-              <thead>
-                <tr>
-                  <th><i className="fas fa-id-badge"></i> ID</th>
-                  <th><i className="fas fa-address-card"></i> Cédula</th>
-                  <th><i className="fas fa-user"></i> Nombre Completo</th>
-                  <th><i className="fas fa-envelope"></i> Correo</th>
-                  <th><i className="fas fa-user-check"></i> Estado</th>
-                  <th><i className="fas fa-cog"></i> Acción</th>
-                </tr>
-              </thead>
-              <tbody>
-                {clientes.map(cliente => (
-                  <tr key={cliente.id_cliente}>
-                    <td>{cliente.id_cliente}</td>
-                    <td>{cliente.cedula}</td>
-                    <td>{cliente.nombres} {cliente.apellidos}</td>
-                    <td>{cliente.correo}</td>
-                    <td>
-                      {cliente.id_instructor ? (
-                        <span className="badge bg-success">
-                          <i className="fas fa-check-circle"></i> Asignado
-                        </span>
-                      ) : (
-                        <span className="badge bg-warning text-dark">
-                          <i className="fas fa-user-slash"></i> Sin Instructor
-                        </span>
-                      )}
-                    </td>
-                    <td>
-                      {!cliente.id_instructor ? (
-                        <button
-                          className="btn btn-sm btn-primary"
-                          onClick={() => asignarInstructor(cliente.id_cliente)}
-                        >
-                          <i className="fas fa-user-plus"></i> Asignar
-                        </button>
-                      ) : (
-                        <button className="btn btn-sm btn-secondary" disabled>
-                          <i className="fas fa-user-alt-slash"></i> Asignado
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+      <div className={styles.pageContainer}>
+        {/* Logo */}
+        <div className={styles.logoContainer}>
+          <img src="/logo.png" alt="Logo GymTEC" className={styles.logoImage} />
         </div>
-      </main>
-    </div>
+
+        {/* Botón Inicio */}
+        <button
+            className={styles.homeButton}
+            onClick={() => router.push('/instructor/Dashboard')}
+        >
+          <i className="fas fa-home"></i> Inicio
+        </button>
+
+        {/* Botón Cerrar Sesión */}
+        <button className={styles.logoutButton} onClick={logout}>
+          <i className="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </button>
+
+        <main className="container">
+          <h2 className={styles.mainHeader}>
+            <i className="fas fa-clipboard-list"></i> Creación de Plan de Trabajo
+          </h2>
+          <p className={styles.subHeader}>
+            Diseña un plan semanal o mensual y asígnalo a un cliente
+          </p>
+
+          {/* Mostrar mensaje de error si existe */}
+          {error && (
+              <div className="alert alert-danger" role="alert">
+                <i className="fas fa-exclamation-triangle"></i> {error}
+              </div>
+          )}
+
+          <div className={styles.contentCard}>
+            <h3><i className="fas fa-pen"></i> Nuevo Plan de Trabajo</h3>
+            <form onSubmit={handleSubmit} className="mt-3">
+              {/* Cliente */}
+              <div className="mb-3">
+                <label htmlFor="clienteSelect" className="form-label">
+                  <i className="fas fa-user"></i> Cliente
+                </label>
+                <select
+                    id="clienteSelect"
+                    className="form-select"
+                    value={idCliente}
+                    onChange={e => setIdCliente(Number(e.target.value))}
+                    required
+                >
+                  <option value="">-- Seleccione un cliente --</option>
+                  {clientes.map(c => (
+                      <option key={c.id_cliente} value={c.id_cliente}>
+                        {c.nombres} {c.apellidos} (Cédula: {c.cedula})
+                      </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Fecha de Inicio */}
+              <div className="mb-3">
+                <label htmlFor="startDate" className="form-label">
+                  <i className="fas fa-calendar-alt"></i> Fecha de Inicio
+                </label>
+                <input
+                    type="date"
+                    id="startDate"
+                    className="form-control"
+                    value={startDate}
+                    onChange={e => setStartDate(e.target.value)}
+                    required
+                />
+              </div>
+
+              {/* Fecha de Fin */}
+              <div className="mb-3">
+                <label htmlFor="endDate" className="form-label">
+                  <i className="fas fa-calendar-check"></i> Fecha de Fin
+                </label>
+                <input
+                    type="date"
+                    id="endDate"
+                    className="form-control"
+                    value={endDate}
+                    onChange={e => setEndDate(e.target.value)}
+                    required
+                />
+              </div>
+
+              {/* Descripción */}
+              <div className="mb-3">
+                <label htmlFor="descripcion" className="form-label">
+                  <i className="fas fa-align-left"></i> Descripción
+                </label>
+                <textarea
+                    id="descripcion"
+                    className="form-control"
+                    rows={4}
+                    placeholder="Describe objetivos, ejercicios y metas..."
+                    value={descripcion}
+                    onChange={e => setDescripcion(e.target.value)}
+                />
+              </div>
+
+              <button type="submit" className="btn btn-success">
+                <i className="fas fa-save"></i> Guardar Plan
+              </button>
+            </form>
+
+            {/* Planes creados */}
+            {createdPlans.length > 0 && (
+                <div className="mt-5">
+                  <h3><i className="fas fa-list-alt"></i> Planes Creados</h3>
+                  <div className="table-responsive">
+                    <table className="table table-bordered mt-3">
+                      <thead className="table-light">
+                      <tr>
+                        <th>ID Plan</th>
+                        <th>Cliente</th>
+                        <th>Inicio</th>
+                        <th>Fin</th>
+                        <th>Descripción</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {createdPlans.map(plan => {
+                        const cli = clientes.find(c => c.id_cliente === plan.id_cliente);
+                        return (
+                            <tr key={plan.id_plan_trabajo}>
+                              <td>{plan.id_plan_trabajo}</td>
+                              <td>{cli?.nombres} {cli?.apellidos}</td>
+                              <td>{plan.start_date}</td>
+                              <td>{plan.end_date}</td>
+                              <td>{plan.descripcion || '—'}</td>
+                            </tr>
+                        );
+                      })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+            )}
+          </div>
+        </main>
+      </div>
   );
 }

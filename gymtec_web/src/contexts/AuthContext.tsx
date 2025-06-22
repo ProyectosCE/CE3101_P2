@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/router';
 
 interface User {
+  id: number;
   nombre: string;
   correo: string;
   rol: 'ADMIN' | 'CLIENTE' | 'INSTRUCTOR';
@@ -39,43 +40,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       contrasena: string,
       rol: 'ADMIN' | 'CLIENTE' | 'INSTRUCTOR'
   ) => {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
     try {
-      const response = await fetch('http://localhost:5000/api/Auth/login', {
+      const response = await fetch(`${API_URL}/api/Auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           correo,
           password: contrasena,
-          rol: rol.toLowerCase(), // el backend espera "cliente", "admin", "instructor"
+          rol: rol.toLowerCase(),
         }),
       });
 
       const data = await response.json();
 
-      if (response.status === 400) {
-        throw new Error(data.mensaje || 'Solicitud incorrecta (400)');
-      }
-
-      if (response.status === 404) {
-        throw new Error(data.mensaje || 'Usuario no encontrado (404)');
-      }
-
-      if (response.status === 401) {
-        throw new Error(data.mensaje || 'Credenciales inválidas (401)');
-      }
-
-      if (response.status === 500) {
-        throw new Error('Error interno del servidor (500)');
-      }
-
-      if (!response.ok || !data.succes) {
-        throw new Error(data.mensaje || 'Error desconocido');
-      }
+      if (response.status === 400) throw new Error(data.mensaje || 'Solicitud incorrecta (400)');
+      if (response.status === 404) throw new Error(data.mensaje || 'No encontrado (404)');
+      if (response.status === 401) throw new Error(data.mensaje || 'Credenciales inválidas (401)');
+      if (response.status === 500) throw new Error('Error interno del servidor (500)');
+      if (!response.ok || !data.succes) throw new Error(data.mensaje || 'Error desconocido');
 
       const nombre = data.cliente || data.empleado || 'Usuario';
-      const nuevoUsuario: User = { nombre, correo, rol };
+      const id = data.id;
+
+      const nuevoUsuario: User = {
+        id,
+        nombre,
+        correo,
+        rol,
+      };
 
       setUser(nuevoUsuario);
       localStorage.setItem('gymtec_user', JSON.stringify(nuevoUsuario));
@@ -92,7 +86,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           break;
       }
     } catch (err: any) {
-      console.error('Error en login:', err);
+      console.error('Error en login:', err.message);
       throw err;
     }
   };

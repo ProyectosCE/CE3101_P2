@@ -30,7 +30,7 @@ export default function ClienteDashboard() {
       <div className={styles.contentCard}>
         {/* Encabezado de bienvenida */}
         <h2 className={styles.mainHeader}>
-          <i className="fas fa-user-circle"></i> Bienvenido, {user?.nombre_completo}
+          <i className="fas fa-user-circle"></i> Bienvenido, {user?.nombre}
         </h2>
         <p className={styles.subHeader}>
           Desde aquí puede ver su plan de trabajo o buscar y registrarse en nuevas clases.

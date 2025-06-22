@@ -1,97 +1,87 @@
 // src/pages/cliente/MyPlan.tsx
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/ClientPage.module.css';
 
 export default function MyPlan() {
-  const { user, logout } = useAuth();
-  const router = useRouter();
-  const [selectedDate, setSelectedDate] = useState<string>('');
+    const { user, logout } = useAuth();
+    const router = useRouter();
+    const [selectedDate, setSelectedDate] = useState<string>('');
+    const [planTrabajo, setPlanTrabajo] = useState<any[]>([]);
 
-  // Parsear fecha ISO → Date local
-  const parseLocalDate = (iso: string) => {
-    const [y, m, d] = iso.split('-').map(Number);
-    return new Date(y, m - 1, d);
-  };
-  const localDate = selectedDate ? parseLocalDate(selectedDate) : null;
+    useEffect(() => {
+        const fetchPlan = async () => {
+            if (!user?.id) return;
+            try {
+                const res = await fetch(`/api/plantrabajo/${user.id}`);
+                const data = await res.json();
+                if (data.success) setPlanTrabajo(data.data);
+            } catch (err) {
+                console.error('Error al obtener plan:', err);
+            }
+        };
+        fetchPlan();
+    }, [user]);
 
-  const formatDate = (date: Date) =>
-    `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+    const parseLocalDate = (iso: string) => {
+        const [y, m, d] = iso.split('-').map(Number);
+        return new Date(y, m - 1, d);
+    };
 
-  const handleLogout = () => {
-    logout();
-    router.push('/login');
-  };
+    const localDate = selectedDate ? parseLocalDate(selectedDate) : null;
 
-  return (
-    <div className={styles.pageContainer}>
-      {/* Logo */}
-      <div className={styles.logoContainer}>
-        <img src="/logo.png" alt="Logo GymTEC" className={styles.logoImage} />
-      </div>
+    const formatDate = (date: Date) => `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
 
-      {/* Botones Inicio & Cerrar Sesión */}
-      <button
-        className={styles.homeButton}
-        onClick={() => router.push('/cliente/Dashboard')}
-      >
-        <i className="fas fa-home" /> Inicio
-      </button>
-      <button className={styles.logoutButton} onClick={handleLogout}>
-        <i className="fas fa-sign-out-alt" /> Cerrar Sesión
-      </button>
+    const handleLogout = () => {
+        logout();
+        router.push('/login');
+    };
 
-      <div className={styles.contentCard}>
-        <h3>
-          <i className="fas fa-calendar-alt" /> Mi Plan de Trabajo
-        </h3>
-        <p>Seleccione una fecha para ver su plan asignado:</p>
+    const filteredPlan = planTrabajo.filter(p => p.fecha === selectedDate);
 
-        {/* selector de fecha con icono */}
-        <div className="input-group mx-auto" style={{ maxWidth: 200 }}>
+    return (
+        <div className={styles.pageContainer}>
+            <div className={styles.logoContainer}>
+                <img src="/logo.png" alt="Logo GymTEC" className={styles.logoImage} />
+            </div>
+            <button className={styles.homeButton} onClick={() => router.push('/cliente/Dashboard')}>
+                <i className="fas fa-home" /> Inicio
+            </button>
+            <button className={styles.logoutButton} onClick={handleLogout}>
+                <i className="fas fa-sign-out-alt" /> Cerrar Sesión
+            </button>
+
+            <div className={styles.contentCard}>
+                <h3><i className="fas fa-calendar-alt" /> Mi Plan de Trabajo</h3>
+                <p>Seleccione una fecha para ver su plan asignado:</p>
+                <div className="input-group mx-auto" style={{ maxWidth: 200 }}>
           <span className="input-group-text">
             <i className="fas fa-calendar-day" />
           </span>
-          <input
-            type="date"
-            className="form-control"
-            value={selectedDate}
-            onChange={e => setSelectedDate(e.target.value)}
-          />
+                    <input type="date" className="form-control" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} />
+                </div>
+                {localDate ? (
+                    filteredPlan.length > 0 ? (
+                        <div style={{ marginTop: 20 }}>
+                            <h4>Plan para {formatDate(localDate)}</h4>
+                            <ul className="list-unstyled">
+                                {filteredPlan.map((p, i) => (
+                                    <li key={i}><i className="fas fa-dumbbell me-2" />{p.descripcion}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    ) : (
+                        <div style={{ textAlign: 'center', color: '#777', marginTop: 20 }}>
+                            <i className="fas fa-info-circle me-2" />No hay plan para esta fecha.
+                        </div>
+                    )
+                ) : (
+                    <div style={{ textAlign: 'center', color: '#777', marginTop: 20 }}>
+                        <i className="fas fa-info-circle me-2" />No hay fecha seleccionada.
+                    </div>
+                )}
+            </div>
         </div>
-
-        {/* detalle del plan con iconos */}
-        {localDate ? (
-          <div style={{ marginTop: 20 }}>
-            <h4>Plan para {formatDate(localDate)}</h4>
-            <ul className="list-unstyled">
-              <li>
-                <i className="fas fa-fire-alt text-danger me-2" />
-                Calentamiento: 10 min
-              </li>
-              <li>
-                <i className="fas fa-running text-primary me-2" />
-                Cardio: 20 min en cinta
-              </li>
-              <li>
-                <i className="fas fa-dumbbell text-secondary me-2" />
-                Fuerza: Circuito de piernas
-              </li>
-              <li>
-                <i className="fas fa-child text-success me-2" />
-                Estiramientos: 10 min
-              </li>
-            </ul>
-          </div>
-        ) : (
-          <div style={{ textAlign: 'center', color: '#777', marginTop: 20 }}>
-            <i className="fas fa-info-circle me-2" />
-            No hay fecha seleccionada.
-          </div>
-        )}
-      </div>
-    </div>
-  );
+    );
 }

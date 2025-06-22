@@ -12,20 +12,6 @@ services:
     networks:
       - backend
 
-  nginx:
-    image: nginx:latest
-    container_name: gymtec_nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./Docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./Docker/sslcerts:/etc/nginx/sslcerts:ro  # Monta la carpeta de certificados
-    depends_on:
-      - gymtec_api
-    networks:
-      - backend
-
   postgresdb:
     image: postgres:latest
     container_name: gymtec_db
@@ -52,9 +38,27 @@ services:
       PGADMIN_DEFAULT_EMAIL: gymtec@gmail.com
       PGADMIN_DEFAULT_USERNAME: gymtec
       PGADMIN_DEFAULT_PASSWORD: gymtec
-      
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      -  postgresdb
+    networks:
+      - backend
+
+nginx:
+    image: nginx:latest
+    container_name: gymtec_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./Docker/sslcerts:/etc/nginx/sslcerts:ro  # Monta la carpeta de certificados
+    depends_on:
+      - gymtec_api
+      - postgresdb
+      - pgadmin
+    restart: always
     networks:
       - backend
 

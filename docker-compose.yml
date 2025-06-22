@@ -16,9 +16,7 @@ services:
       - postgresdb
     networks:
       - backend
-    env_file:
-      - path: ./Docker/.env.production
-
+    
 
   postgresdb:
     image: postgres:latest
@@ -35,8 +33,7 @@ services:
       - ./Docker/postgresql/init-db:/docker-entrypoint-initdb.d
     networks:
       - backend
-    env_file:
-      - path: ./Docker/.env.production
+    
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -54,9 +51,7 @@ services:
       -  postgresdb
     networks:
       - backend
-    env_file:
-      - path: ./Docker/.env.production
-
+    
   nginx:
       image: nginx:latest
       container_name: gymtec_nginx

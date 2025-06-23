@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/AdminPage.module.css';
+import { API_BASE_URL } from '@/stores/api';
 
 interface Position { id_puesto: number; descripcion: string; isDefault: boolean; }
 interface Branch { id: number; nombre: string; }
@@ -58,7 +59,7 @@ export default function Employees() {
 
   useEffect(() => {
     // cargar sucursales
-    fetch('/api/sucursal')
+    fetch(`${API_BASE_URL}/api/sucursal`)
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -71,7 +72,7 @@ export default function Employees() {
         }).catch(() => alert('Error servidor sucursales'));
 
     // cargar empleados
-    fetch('/api/empleado')
+    fetch(`${API_BASE_URL}/api/empleado`)
         .then(res => {
           if (res.status === 401) throw new Error('No autorizado');
           return res.json();
@@ -122,7 +123,7 @@ export default function Employees() {
   const deleteEmployee = async (id: number) => {
     if (!confirm('¿Eliminar este empleado?')) return;
     try {
-      const res = await fetch(`/api/empleado/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE_URL}/api/empleado/${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (res.status === 200) {
         setEmployees(employees.filter(e => e.id_empleado !== id));
@@ -140,8 +141,8 @@ export default function Employees() {
     try {
       const method = isEditing ? 'PATCH' : 'POST';
       const url = isEditing
-          ? `/api/empleado/${editingId}`
-          : `/api/empleado`;
+          ? `${API_BASE_URL}/api/empleado/${editingId}`
+          : `${API_BASE_URL}/api/empleado`;
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },

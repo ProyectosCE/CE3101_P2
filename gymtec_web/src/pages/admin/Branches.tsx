@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/AdminPage.module.css';
+import { API_BASE_URL } from '@/stores/api';
 
 interface Branch {
   id_sucursal: number;
@@ -37,7 +38,7 @@ export default function Branches() {
 
   const fetchBranches = async () => {
     try {
-      const res = await fetch('/api/sucursal');
+      const res = await fetch(`${API_BASE_URL}/api/sucursal`);
       const json = await res.json();
       if (!json.success) throw new Error(json.error);
       setBranches(json.data);
@@ -99,7 +100,7 @@ export default function Branches() {
   const handleDelete = async (id: number) => {
     if (!confirm('¿Confirma eliminar esta sucursal?')) return;
     try {
-      const res = await fetch(`/api/sucursal/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE_URL}/api/sucursal/${id}`, { method: 'DELETE' });
       const json = await res.json();
       if (!json.success) throw new Error(json.error);
       fetchBranches();
@@ -116,7 +117,7 @@ export default function Branches() {
 
     try {
       const method = isEditing ? 'PATCH' : 'POST';
-      const url = isEditing ? `/api/sucursal/${editingId}` : '/api/sucursal';
+      const url = isEditing ? `${API_BASE_URL}/api/sucursal/${editingId}` : '/api/sucursal';
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },

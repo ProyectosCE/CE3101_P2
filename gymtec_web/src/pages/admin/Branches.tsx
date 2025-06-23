@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/AdminPage.module.css';
-import { API_BASE_URL } from '@/stores/api';
+import {API_BASE_URL} from '@/stores/api';
 
 interface Branch {
   id_sucursal: number;
@@ -117,7 +117,9 @@ export default function Branches() {
 
     try {
       const method = isEditing ? 'PATCH' : 'POST';
-      const url = isEditing ? `${API_BASE_URL}/api/sucursal/${editingId}` : '/api/sucursal';
+      const url = isEditing
+          ? `${API_BASE_URL}/api/sucursal/${editingId}`
+          : `${API_BASE_URL}/api/sucursal`;
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },

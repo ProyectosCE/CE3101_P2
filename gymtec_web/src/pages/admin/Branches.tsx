@@ -162,5 +162,232 @@ export default function Branches() {
     router.push('/login');
   };
 
-  return <div className={styles.pageContainer}>[...Interfaz sin cambios...]</div>;
+  return (
+      <div className={styles.pageContainer}>
+        {/* Logo y botones */}
+        <div className={styles.logoContainer}>
+          <img src="/logo.png" alt="Logo GymTEC" className={styles.logoImage} />
+        </div>
+        <button className={styles.homeButton} onClick={() => router.push('/admin/Dashboard')}>
+          <i className="fas fa-home" /> Inicio
+        </button>
+        <button className={styles.logoutButton} onClick={handleLogout}>
+          <i className="fas fa-sign-out-alt" /> Cerrar Sesión
+        </button>
+
+        {/* Contenido principal */}
+        <div className={styles.contentCard}>
+          <h3><i className="fas fa-building"></i> Gestión de Sucursales</h3>
+          <button className="btn btn-primary mb-3" onClick={openCreateModal}>
+            <i className="fas fa-plus"></i> Nueva Sucursal
+          </button>
+
+          {/* Modal de creación/edición */}
+          {showModal && (
+              <div className="modal d-block" style={{ background: 'rgba(0,0,0,0.5)' }}>
+                <div className="modal-dialog modal-dialog-centered">
+                  <div className="modal-content">
+                    <div className="modal-header">
+                      <h5 className="modal-title">
+                        <i className={isEditing ? 'fas fa-edit' : 'fas fa-plus'}></i>{' '}
+                        {isEditing ? 'Editar Sucursal' : 'Nueva Sucursal'}
+                      </h5>
+                      <button
+                          type="button"
+                          className="btn-close"
+                          onClick={() => setShowModal(false)}
+                      />
+                    </div>
+                    <div className="modal-body">
+                      {/* Nombre */}
+                      <div className="mb-2">
+                        <label className="form-label">Nombre</label>
+                        <input
+                            id="nombre"
+                            className="form-control"
+                            value={form.nombre}
+                            onChange={handleChange}
+                        />
+                      </div>
+                      {/* Dirección */}
+                      <div className="row g-2 mb-2">
+                        <div className="col">
+                          <input
+                              id="provincia"
+                              className="form-control"
+                              placeholder="Provincia"
+                              value={form.provincia}
+                              onChange={handleChange}
+                          />
+                        </div>
+                        <div className="col">
+                          <input
+                              id="canton"
+                              className="form-control"
+                              placeholder="Cantón"
+                              value={form.canton}
+                              onChange={handleChange}
+                          />
+                        </div>
+                        <div className="col">
+                          <input
+                              id="distrito"
+                              className="form-control"
+                              placeholder="Distrito"
+                              value={form.distrito}
+                              onChange={handleChange}
+                          />
+                        </div>
+                      </div>
+                      {/* Fecha y horario */}
+                      <div className="mb-2">
+                        <label className="form-label">Fecha Apertura</label>
+                        <input
+                            id="fechaApertura"
+                            type="date"
+                            className="form-control"
+                            value={form.fechaApertura}
+                            onChange={handleChange}
+                        />
+                      </div>
+                      <div className="mb-2">
+                        <label className="form-label">Horario Atención</label>
+                        <input
+                            id="horarioAtencion"
+                            type="text"
+                            className="form-control"
+                            placeholder="08:00 - 20:00"
+                            value={form.horarioAtencion}
+                            onChange={handleChange}
+                        />
+                      </div>
+                      {/* Capacidad */}
+                      <div className="mb-2">
+                        <label className="form-label">Capacidad Máx.</label>
+                        <input
+                            id="capacidadMax"
+                            type="number"
+                            className="form-control"
+                            value={form.capacidadMax}
+                            onChange={handleChange}
+                            min={0}
+                        />
+                      </div>
+                      {/* Teléfonos */}
+                      <div className="mb-2">
+                        <label className="form-label">Teléfonos</label>
+                        {form.telefonos.map((tel,i)=>(
+                            <input
+                                key={i}
+                                className="form-control mb-1"
+                                value={tel}
+                                placeholder="Ej: 88881234"
+                                onChange={e=>handlePhoneChange(i,e.target.value)}
+                            />
+                        ))}
+                        <button
+                            type="button"
+                            className="btn btn-outline-secondary btn-sm"
+                            onClick={addPhoneField}
+                        >
+                          <i className="fas fa-phone-plus"></i> Agregar teléfono
+                        </button>
+                      </div>
+                      {/* Spa/Tienda */}
+                      <div className="form-check form-switch mb-2">
+                        <input
+                            id="spaActivo"
+                            type="checkbox"
+                            className="form-check-input"
+                            checked={form.spaActivo}
+                            onChange={handleChange}
+                        />
+                        <label className="form-check-label">Spa Activo</label>
+                      </div>
+                      <div className="form-check form-switch">
+                        <input
+                            id="tiendaActivo"
+                            type="checkbox"
+                            className="form-check-input"
+                            checked={form.tiendaActivo}
+                            onChange={handleChange}
+                        />
+                        <label className="form-check-label">Tienda Activa</label>
+                      </div>
+                    </div>
+                    <div className="modal-footer">
+                      <button
+                          className="btn btn-secondary"
+                          onClick={() => setShowModal(false)}
+                      >
+                        <i className="fas fa-times"></i> Cancelar
+                      </button>
+                      <button className="btn btn-primary" onClick={handleSave}>
+                        <i className="fas fa-save"></i> {isEditing ? 'Actualizar' : 'Guardar'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          )}
+
+          {/* Tabla de sucursales con acciones CRUD */}
+          <div className="table-responsive">
+            <table className="table table-bordered">
+              <thead className="table-light">
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Dirección</th>
+                <th>Apertura</th>
+                <th>Horario</th>
+                <th>Capacidad</th>
+                <th>Teléfonos</th>
+                <th>Spa</th>
+                <th>Tienda</th>
+                <th>Acciones</th>
+              </tr>
+              </thead>
+              <tbody>
+              {branches.map(b => (
+                  <tr key={b.id}>
+                    <td>{b.id}</td>
+                    <td>{b.nombre}</td>
+                    <td>{`${b.provincia}, ${b.canton}, ${b.distrito}`}</td>
+                    <td>{b.fechaApertura}</td>
+                    <td>{b.horarioAtencion}</td>
+                    <td>{b.capacidadMax}</td>
+                    <td>{b.telefonos.join(', ')}</td>
+                    <td>
+                      {b.spaActivo
+                          ? <i className="fas fa-check text-success" />
+                          : <i className="fas fa-times text-danger" />}
+                    </td>
+                    <td>
+                      {b.tiendaActivo
+                          ? <i className="fas fa-check text-success" />
+                          : <i className="fas fa-times text-danger" />}
+                    </td>
+                    <td>
+                      <button
+                          className="btn btn-sm btn-outline-secondary me-2"
+                          onClick={() => openEditModal(b)}
+                      >
+                        <i className="fas fa-edit"></i>
+                      </button>
+                      <button
+                          className="btn btn-sm btn-outline-danger"
+                          onClick={() => handleDelete(b.id)}
+                      >
+                        <i className="fas fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+              ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+  );
 }

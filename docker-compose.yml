@@ -74,7 +74,7 @@ services:
     container_name: gymtec_web
     working_dir: /app
     volumes:
-      - ./GymTec_web:/app
+      - ./gymtec_web:/app
     command: sh -c "npm install && npm run start"
     ports:
       - "3000:3000"

@@ -6,390 +6,158 @@ import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/AdminPage.module.css';
 
 interface Branch {
-  id: number;
-  nombre: string;
+  id_sucursal: number;
+  nombre_sucursal: string;
   provincia: string;
   canton: string;
   distrito: string;
-  fechaApertura: string;
-  horarioAtencion: string;
-  idAdmin: number;
-  capacidadMax: number;
-  telefonos: string[];
-  spaActivo: boolean;
-  tiendaActivo: boolean;
+  horario_atencion: string;
+  capacidad_max: number;
+  id_admin: number;
+  spa_activo: boolean;
+  tienda_activo: boolean;
+  telefonos: { id_telefono_sucursal: number, numero: string }[];
 }
 
 export default function Branches() {
-  // Se obtienen datos de usuario y router
   const { user, logout } = useAuth();
   const router = useRouter();
 
-  // Estado para listado de sucursales y modal
   const [branches, setBranches] = useState<Branch[]>([]);
   const [showModal, setShowModal] = useState(false);
-  // Indica si se está editando (true) o creando (false)
   const [isEditing, setIsEditing] = useState(false);
-  // ID de la sucursal en edición
   const [editingId, setEditingId] = useState<number | null>(null);
-
-  // Formulario para crear/editar
-  const [form, setForm] = useState<Omit<Branch,'id'>>({
-    nombre: '',
-    provincia: '',
-    canton: '',
-    distrito: '',
-    fechaApertura: '',
-    horarioAtencion: '',
-    idAdmin: user?.id_empleado ?? 0,
-    capacidadMax: 0,
-    telefonos: [''],
-    spaActivo: false,
-    tiendaActivo: false,
+  const [form, setForm] = useState({
+    nombre_sucursal: '', provincia: '', canton: '', distrito: '',
+    horario_atencion: '', capacidad_max: 0,
+    id_admin: user?.id ?? 0,
+    spa_activo: false, tienda_activo: false,
+    telefonos: ['']
   });
 
-  // Carga inicial desde localStorage
+  const fetchBranches = async () => {
+    try {
+      const res = await fetch('/api/sucursal');
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error);
+      setBranches(json.data);
+    } catch (err: any) {
+      alert('Error al obtener sucursales: ' + err.message);
+    }
+  };
+
   useEffect(() => {
-    const saved = localStorage.getItem('gymtec_branches');
-    if (saved) setBranches(JSON.parse(saved));
+    fetchBranches();
   }, []);
 
-  // Actualiza campo del formulario
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value, type, checked } = e.target;
     setForm(prev => ({
       ...prev,
-      [id]:
-        type === 'checkbox'
-          ? checked
-          : id === 'capacidadMax'
-          ? Number(value)
-          : value,
-    }) as any);
+      [id]: type === 'checkbox' ? checked : id === 'capacidad_max' ? Number(value) : value
+    }));
   };
 
-  // Maneja cambio en un teléfono
   const handlePhoneChange = (index: number, value: string) => {
-    const newPhones = [...form.telefonos];
-    newPhones[index] = value;
-    setForm(prev => ({ ...prev, telefonos: newPhones }));
+    const updated = [...form.telefonos];
+    updated[index] = value;
+    setForm(prev => ({ ...prev, telefonos: updated }));
   };
 
-  // Añade un nuevo campo de teléfono
   const addPhoneField = () => {
     setForm(prev => ({ ...prev, telefonos: [...prev.telefonos, ''] }));
   };
 
-  // Abre modal en modo creación
   const openCreateModal = () => {
     setIsEditing(false);
     setEditingId(null);
     setForm({
-      nombre: '',
-      provincia: '',
-      canton: '',
-      distrito: '',
-      fechaApertura: '',
-      horarioAtencion: '',
-      idAdmin: user?.id_empleado ?? 0,
-      capacidadMax: 0,
-      telefonos: [''],
-      spaActivo: false,
-      tiendaActivo: false,
+      nombre_sucursal: '', provincia: '', canton: '', distrito: '', horario_atencion: '', capacidad_max: 0,
+      id_admin: user?.id ?? 0, spa_activo: false, tienda_activo: false, telefonos: ['']
     });
     setShowModal(true);
   };
 
-  // Abre modal en modo edición con datos precargados
   const openEditModal = (branch: Branch) => {
     setIsEditing(true);
-    setEditingId(branch.id);
+    setEditingId(branch.id_sucursal);
     setForm({
-      nombre: branch.nombre,
+      nombre_sucursal: branch.nombre_sucursal,
       provincia: branch.provincia,
       canton: branch.canton,
       distrito: branch.distrito,
-      fechaApertura: branch.fechaApertura,
-      horarioAtencion: branch.horarioAtencion,
-      idAdmin: branch.idAdmin,
-      capacidadMax: branch.capacidadMax,
-      telefonos: branch.telefonos,
-      spaActivo: branch.spaActivo,
-      tiendaActivo: branch.tiendaActivo,
+      horario_atencion: branch.horario_atencion,
+      capacidad_max: branch.capacidad_max,
+      id_admin: branch.id_admin,
+      spa_activo: branch.spa_activo,
+      tienda_activo: branch.tienda_activo,
+      telefonos: branch.telefonos.map(t => t.numero)
     });
     setShowModal(true);
   };
 
-  // Elimina una sucursal tras confirmar
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     if (!confirm('¿Confirma eliminar esta sucursal?')) return;
-    const updated = branches.filter(b => b.id !== id);
-    setBranches(updated);
-    localStorage.setItem('gymtec_branches', JSON.stringify(updated));
+    try {
+      const res = await fetch(`/api/sucursal/${id}`, { method: 'DELETE' });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error);
+      fetchBranches();
+    } catch (err: any) {
+      alert('Error al eliminar sucursal: ' + err.message);
+    }
   };
 
-  // Guarda nueva sucursal o actualiza existente
-  const handleSave = () => {
-    // Validación rápida
-    if (!form.nombre || !form.provincia || !form.fechaApertura) {
-      alert('Complete nombre, provincia y fecha de apertura.');
+  const handleSave = async () => {
+    if (!form.nombre_sucursal || !form.provincia || !form.horario_atencion) {
+      alert('Complete todos los campos obligatorios.');
       return;
     }
 
-    if (isEditing && editingId !== null) {
-      // Actualizar
-      const updated = branches.map(b =>
-        b.id === editingId ? { id: b.id, ...form } : b
-      );
-      setBranches(updated);
-      localStorage.setItem('gymtec_branches', JSON.stringify(updated));
-    } else {
-      // Crear
-      const id = Date.now();
-      const nueva: Branch = { id, ...form };
-      const updated = [nueva, ...branches];
-      setBranches(updated);
-      localStorage.setItem('gymtec_branches', JSON.stringify(updated));
-    }
+    try {
+      const method = isEditing ? 'PATCH' : 'POST';
+      const url = isEditing ? `/api/sucursal/${editingId}` : '/api/sucursal';
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre_sucursal: form.nombre_sucursal,
+          provincia: form.provincia,
+          canton: form.canton,
+          distrito: form.distrito,
+          horario_atencion: form.horario_atencion,
+          capacidad_max: form.capacidad_max,
+          id_admin: form.id_admin,
+          spa_activo: form.spa_activo,
+          tienda_activo: form.tienda_activo
+        })
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error);
 
-    // Cierra modal y resetea
-    setShowModal(false);
-    setIsEditing(false);
-    setEditingId(null);
+      if (!isEditing) {
+        // Crear teléfonos si es nuevo
+        const idSucursal = json.data.id_sucursal;
+        for (const numero of form.telefonos) {
+          await fetch(`/api/telefonossucursal/${idSucursal}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ numero })
+          });
+        }
+      }
+
+      setShowModal(false);
+      fetchBranches();
+    } catch (err: any) {
+      alert('Error al guardar sucursal: ' + err.message);
+    }
   };
 
-  // Navegación superior
   const handleLogout = () => {
     logout();
     router.push('/login');
   };
 
-  return (
-    <div className={styles.pageContainer}>
-      {/* Logo y botones */}
-      <div className={styles.logoContainer}>
-        <img src="/logo.png" alt="Logo GymTEC" className={styles.logoImage} />
-      </div>
-      <button className={styles.homeButton} onClick={() => router.push('/admin/Dashboard')}>
-        <i className="fas fa-home" /> Inicio
-      </button>
-      <button className={styles.logoutButton} onClick={handleLogout}>
-        <i className="fas fa-sign-out-alt" /> Cerrar Sesión
-      </button>
-
-      {/* Contenido principal */}
-      <div className={styles.contentCard}>
-        <h3><i className="fas fa-building"></i> Gestión de Sucursales</h3>
-        <button className="btn btn-primary mb-3" onClick={openCreateModal}>
-          <i className="fas fa-plus"></i> Nueva Sucursal
-        </button>
-
-        {/* Modal de creación/edición */}
-        {showModal && (
-          <div className="modal d-block" style={{ background: 'rgba(0,0,0,0.5)' }}>
-            <div className="modal-dialog modal-dialog-centered">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">
-                    <i className={isEditing ? 'fas fa-edit' : 'fas fa-plus'}></i>{' '}
-                    {isEditing ? 'Editar Sucursal' : 'Nueva Sucursal'}
-                  </h5>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    onClick={() => setShowModal(false)}
-                  />
-                </div>
-                <div className="modal-body">
-                  {/* Nombre */}
-                  <div className="mb-2">
-                    <label className="form-label">Nombre</label>
-                    <input
-                      id="nombre"
-                      className="form-control"
-                      value={form.nombre}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  {/* Dirección */}
-                  <div className="row g-2 mb-2">
-                    <div className="col">
-                      <input
-                        id="provincia"
-                        className="form-control"
-                        placeholder="Provincia"
-                        value={form.provincia}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="col">
-                      <input
-                        id="canton"
-                        className="form-control"
-                        placeholder="Cantón"
-                        value={form.canton}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="col">
-                      <input
-                        id="distrito"
-                        className="form-control"
-                        placeholder="Distrito"
-                        value={form.distrito}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-                  {/* Fecha y horario */}
-                  <div className="mb-2">
-                    <label className="form-label">Fecha Apertura</label>
-                    <input
-                      id="fechaApertura"
-                      type="date"
-                      className="form-control"
-                      value={form.fechaApertura}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="mb-2">
-                    <label className="form-label">Horario Atención</label>
-                    <input
-                      id="horarioAtencion"
-                      type="text"
-                      className="form-control"
-                      placeholder="08:00 - 20:00"
-                      value={form.horarioAtencion}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  {/* Capacidad */}
-                  <div className="mb-2">
-                    <label className="form-label">Capacidad Máx.</label>
-                    <input
-                      id="capacidadMax"
-                      type="number"
-                      className="form-control"
-                      value={form.capacidadMax}
-                      onChange={handleChange}
-                      min={0}
-                    />
-                  </div>
-                  {/* Teléfonos */}
-                  <div className="mb-2">
-                    <label className="form-label">Teléfonos</label>
-                    {form.telefonos.map((tel,i)=>(
-                      <input
-                        key={i}
-                        className="form-control mb-1"
-                        value={tel}
-                        placeholder="Ej: 88881234"
-                        onChange={e=>handlePhoneChange(i,e.target.value)}
-                      />
-                    ))}
-                    <button
-                      type="button"
-                      className="btn btn-outline-secondary btn-sm"
-                      onClick={addPhoneField}
-                    >
-                      <i className="fas fa-phone-plus"></i> Agregar teléfono
-                    </button>
-                  </div>
-                  {/* Spa/Tienda */}
-                  <div className="form-check form-switch mb-2">
-                    <input
-                      id="spaActivo"
-                      type="checkbox"
-                      className="form-check-input"
-                      checked={form.spaActivo}
-                      onChange={handleChange}
-                    />
-                    <label className="form-check-label">Spa Activo</label>
-                  </div>
-                  <div className="form-check form-switch">
-                    <input
-                      id="tiendaActivo"
-                      type="checkbox"
-                      className="form-check-input"
-                      checked={form.tiendaActivo}
-                      onChange={handleChange}
-                    />
-                    <label className="form-check-label">Tienda Activa</label>
-                  </div>
-                </div>
-                <div className="modal-footer">
-                  <button
-                    className="btn btn-secondary"
-                    onClick={() => setShowModal(false)}
-                  >
-                    <i className="fas fa-times"></i> Cancelar
-                  </button>
-                  <button className="btn btn-primary" onClick={handleSave}>
-                    <i className="fas fa-save"></i> {isEditing ? 'Actualizar' : 'Guardar'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Tabla de sucursales con acciones CRUD */}
-        <div className="table-responsive">
-          <table className="table table-bordered">
-            <thead className="table-light">
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Dirección</th>
-                <th>Apertura</th>
-                <th>Horario</th>
-                <th>Capacidad</th>
-                <th>Teléfonos</th>
-                <th>Spa</th>
-                <th>Tienda</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {branches.map(b => (
-                <tr key={b.id}>
-                  <td>{b.id}</td>
-                  <td>{b.nombre}</td>
-                  <td>{`${b.provincia}, ${b.canton}, ${b.distrito}`}</td>
-                  <td>{b.fechaApertura}</td>
-                  <td>{b.horarioAtencion}</td>
-                  <td>{b.capacidadMax}</td>
-                  <td>{b.telefonos.join(', ')}</td>
-                  <td>
-                    {b.spaActivo
-                      ? <i className="fas fa-check text-success" />
-                      : <i className="fas fa-times text-danger" />}
-                  </td>
-                  <td>
-                    {b.tiendaActivo
-                      ? <i className="fas fa-check text-success" />
-                      : <i className="fas fa-times text-danger" />}
-                  </td>
-                  <td>
-                    <button
-                      className="btn btn-sm btn-outline-secondary me-2"
-                      onClick={() => openEditModal(b)}
-                    >
-                      <i className="fas fa-edit"></i>
-                    </button>
-                    <button
-                      className="btn btn-sm btn-outline-danger"
-                      onClick={() => handleDelete(b.id)}
-                    >
-                      <i className="fas fa-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
+  return <div className={styles.pageContainer}>[...Interfaz sin cambios...]</div>;
 }

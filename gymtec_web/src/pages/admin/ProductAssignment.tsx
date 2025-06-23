@@ -6,210 +6,190 @@ import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/AdminPage.module.css';
 
 interface Branch {
-  id: number;
-  nombre: string;
-  tiendaActivo: boolean;
+  id_sucursal: number;
+  nombre_sucursal: string;
+  tienda_activo: boolean;
 }
 
 interface Product {
-  id_producto: number;
+  codigo_barra: string;
   nombre: string;
 }
 
 export default function ProductAssignment() {
-  // Obtiene logout y navegación
   const { logout } = useAuth();
   const router = useRouter();
 
-  // Estado de sucursales con tienda activa
   const [branches, setBranches] = useState<Branch[]>([]);
-  // Estado de productos disponibles
   const [products, setProducts] = useState<Product[]>([]);
-  // Mapa de asociaciones { branchId: [productId, …] }
-  const [assocMap, setAssocMap] = useState<Record<number, number[]>>({});
+  const [associatedProducts, setAssociatedProducts] = useState<string[]>([]);
 
-  // UI state
   const [selectedBranchId, setSelectedBranchId] = useState<number | ''>('');
-  const [toAdd, setToAdd] = useState<Set<number>>(new Set());
-  const [toRemove, setToRemove] = useState<Set<number>>(new Set());
+  const [toAdd, setToAdd] = useState<Set<string>>(new Set());
+  const [toRemove, setToRemove] = useState<Set<string>>(new Set());
 
-  // Carga de datos de ejemplo (reemplazar por API)
   useEffect(() => {
-    // Sucursales de ejemplo
-    const ejemplo: Branch[] = [
-      { id: 1, nombre: 'Central Cartago', tiendaActivo: true },
-      { id: 2, nombre: 'San Carlos', tiendaActivo: true },
-      { id: 3, nombre: 'San José', tiendaActivo: false },
-      { id: 4, nombre: 'Alajuela', tiendaActivo: true },
-      { id: 5, nombre: 'Limón', tiendaActivo: true },
-    ];
-    setBranches(ejemplo.filter(b => b.tiendaActivo));
-
-    // Productos de ejemplo
-    setProducts([
-      { id_producto: 1, nombre: 'Proteína Whey' },
-      { id_producto: 2, nombre: 'Barra Energética' },
-      { id_producto: 3, nombre: 'Bebida Isotónica' },
-      { id_producto: 4, nombre: 'Guantes de Boxeo' },
-    ]);
-
-    // Sin asociaciones inicialmente
-    setAssocMap({});
+    fetchBranches();
+    fetchProducts();
   }, []);
 
-  // Maneja cambio de sucursal
+  const fetchBranches = async () => {
+    try {
+      const res = await fetch('/api/sucursal');
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error);
+      setBranches(json.data.filter((b: Branch) => b.tienda_activo));
+    } catch (err: any) {
+      alert('Error al obtener sucursales: ' + err.message);
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch('/api/producto');
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error);
+      setProducts(json.data);
+    } catch (err: any) {
+      alert('Error al obtener productos: ' + err.message);
+    }
+  };
+
+  const fetchAssociatedProducts = async (id: number) => {
+    try {
+      const res = await fetch(`/api/sucursalxproducto/${id}`);
+      const json = await res.json();
+      if (json.success) {
+        setAssociatedProducts(json.data.map((p: any) => p.codigo_barra));
+      } else {
+        setAssociatedProducts([]);
+      }
+    } catch (err: any) {
+      alert('Error al cargar productos asociados: ' + err.message);
+    }
+  };
+
   const handleBranchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const id = Number(e.target.value);
     setSelectedBranchId(id || '');
     setToAdd(new Set());
     setToRemove(new Set());
+    if (id) fetchAssociatedProducts(id);
   };
 
-  // Asocia productos
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (selectedBranchId === '') return;
-    const current = new Set(assocMap[selectedBranchId] || []);
-    toAdd.forEach(id => current.add(id));
-    setAssocMap({ ...assocMap, [selectedBranchId]: Array.from(current) });
+    for (const codigo of toAdd) {
+      await fetch(`/api/sucursalxproducto/${selectedBranchId}/${codigo}`, {
+        method: 'POST'
+      });
+    }
+    fetchAssociatedProducts(selectedBranchId);
     setToAdd(new Set());
   };
 
-  // Desasocia productos
-  const handleRemove = () => {
+  const handleRemove = async () => {
     if (selectedBranchId === '') return;
-    const current = new Set(assocMap[selectedBranchId] || []);
-    toRemove.forEach(id => current.delete(id));
-    setAssocMap({ ...assocMap, [selectedBranchId]: Array.from(current) });
+    for (const codigo of toRemove) {
+      await fetch(`/api/sucursalxproducto/${selectedBranchId}/${codigo}`, {
+        method: 'DELETE'
+      });
+    }
+    fetchAssociatedProducts(selectedBranchId);
     setToRemove(new Set());
   };
 
-  // Cierra sesión
   const handleLogout = () => {
     logout();
     router.push('/login');
   };
 
-  // Calcula asociados y disponibles
-  const associated = selectedBranchId === ''
-    ? []
-    : (assocMap[selectedBranchId] || [])
-        .map(id => products.find(p => p.id_producto === id)!)
-        .filter(Boolean);
-  const available = selectedBranchId === ''
-    ? []
-    : products.filter(p => !associated.some(a => a.id_producto === p.id_producto));
+  const associated = products.filter(p => associatedProducts.includes(p.codigo_barra));
+  const available = products.filter(p => !associatedProducts.includes(p.codigo_barra));
 
   return (
-    <div className={styles.pageContainer}>
-      {/* Logo */}
-      <div className={styles.logoContainer}>
-        <img src="/logo.png" alt="Logo GymTEC" className={styles.logoImage} />
-      </div>
-
-      {/* Botón Inicio */}
-      <button
-        className={styles.homeButton}
-        onClick={() => router.push('/admin/GymConfiguration')}
-      >
-        <i className="fas fa-sliders-h"></i> Configuración
-      </button>
-
-      {/* Botón Cerrar Sesión */}
-      <button className={styles.logoutButton} onClick={handleLogout}>
-        <i className="fas fa-sign-out-alt"></i> Cerrar Sesión
-      </button>
-
-      {/* Encabezado */}
-      <h2 className={styles.mainHeader}>
-        <i className="fas fa-store"></i> Asociación de Productos a Tienda
-      </h2>
-      <p className={styles.subHeader}>
-        Seleccione una sucursal con tienda y administre sus productos.
-      </p>
-
-      {/* Contenedor de sección */}
-      <div className={styles.sectionContainer}>
-        {/* Selector de sucursal */}
-        <div className="mb-4">
-          <label className="form-label"><strong>Sucursal con Tienda:</strong></label>
-          <select
-            className="form-select"
-            value={selectedBranchId}
-            onChange={handleBranchChange}
-          >
-            <option value="">-- Seleccione una sucursal --</option>
-            {branches.map(b => (
-              <option key={b.id} value={b.id}>{b.nombre}</option>
-            ))}
-          </select>
+      <div className={styles.pageContainer}>
+        <div className={styles.logoContainer}>
+          <img src="/logo.png" alt="Logo GymTEC" className={styles.logoImage} />
         </div>
 
-        {selectedBranchId !== '' && (
-          <div className="row">
-            {/* Productos No Asociados */}
-            <div className="col-md-5">
-              <h5>Productos No Asociados</h5>
-              <ul className="list-group mb-2" style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                {available.map(p => (
-                  <li key={p.id_producto} className="list-group-item">
-                    <input
-                      type="checkbox"
-                      className="form-check-input me-2"
-                      checked={toAdd.has(p.id_producto)}
-                      onChange={() => {
-                        const s = new Set(toAdd);
-                        s.has(p.id_producto)
-                          ? s.delete(p.id_producto)
-                          : s.add(p.id_producto);
-                        setToAdd(s);
-                      }}
-                    />
-                    {p.nombre}
-                  </li>
-                ))}
-              </ul>
-              <button
-                className="btn btn-primary"
-                disabled={toAdd.size === 0}
-                onClick={handleAdd}
-              >
-                <i className="fas fa-plus"></i> Asociar
-              </button>
-            </div>
+        <button className={styles.homeButton} onClick={() => router.push('/admin/GymConfiguration')}>
+          <i className="fas fa-sliders-h"></i> Configuración
+        </button>
+        <button className={styles.logoutButton} onClick={handleLogout}>
+          <i className="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </button>
 
-            {/* Productos Asociados */}
-            <div className="col-md-5 offset-md-2">
-              <h5>Productos Asociados</h5>
-              <ul className="list-group mb-2" style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                {associated.map(p => (
-                  <li key={p.id_producto} className="list-group-item">
-                    <input
-                      type="checkbox"
-                      className="form-check-input me-2"
-                      checked={toRemove.has(p.id_producto)}
-                      onChange={() => {
-                        const s = new Set(toRemove);
-                        s.has(p.id_producto)
-                          ? s.delete(p.id_producto)
-                          : s.add(p.id_producto);
-                        setToRemove(s);
-                      }}
-                    />
-                    {p.nombre}
-                  </li>
-                ))}
-              </ul>
-              <button
-                className="btn btn-danger"
-                disabled={toRemove.size === 0}
-                onClick={handleRemove}
-              >
-                <i className="fas fa-minus"></i> Desasociar
-              </button>
-            </div>
+        <h2 className={styles.mainHeader}>
+          <i className="fas fa-store"></i> Asociación de Productos a Tienda
+        </h2>
+        <p className={styles.subHeader}>
+          Seleccione una sucursal con tienda y administre sus productos.
+        </p>
+
+        <div className={styles.sectionContainer}>
+          <div className="mb-4">
+            <label className="form-label"><strong>Sucursal con Tienda:</strong></label>
+            <select className="form-select" value={selectedBranchId} onChange={handleBranchChange}>
+              <option value="">-- Seleccione una sucursal --</option>
+              {branches.map(b => (
+                  <option key={b.id_sucursal} value={b.id_sucursal}>{b.nombre_sucursal}</option>
+              ))}
+            </select>
           </div>
-        )}
+
+          {selectedBranchId !== '' && (
+              <div className="row">
+                <div className="col-md-5">
+                  <h5>Productos No Asociados</h5>
+                  <ul className="list-group mb-2" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                    {available.map(p => (
+                        <li key={p.codigo_barra} className="list-group-item">
+                          <input
+                              type="checkbox"
+                              className="form-check-input me-2"
+                              checked={toAdd.has(p.codigo_barra)}
+                              onChange={() => {
+                                const s = new Set(toAdd);
+                                s.has(p.codigo_barra) ? s.delete(p.codigo_barra) : s.add(p.codigo_barra);
+                                setToAdd(s);
+                              }}
+                          />
+                          {p.nombre}
+                        </li>
+                    ))}
+                  </ul>
+                  <button className="btn btn-primary" disabled={toAdd.size === 0} onClick={handleAdd}>
+                    <i className="fas fa-plus"></i> Asociar
+                  </button>
+                </div>
+
+                <div className="col-md-5 offset-md-2">
+                  <h5>Productos Asociados</h5>
+                  <ul className="list-group mb-2" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                    {associated.map(p => (
+                        <li key={p.codigo_barra} className="list-group-item">
+                          <input
+                              type="checkbox"
+                              className="form-check-input me-2"
+                              checked={toRemove.has(p.codigo_barra)}
+                              onChange={() => {
+                                const s = new Set(toRemove);
+                                s.has(p.codigo_barra) ? s.delete(p.codigo_barra) : s.add(p.codigo_barra);
+                                setToRemove(s);
+                              }}
+                          />
+                          {p.nombre}
+                        </li>
+                    ))}
+                  </ul>
+                  <button className="btn btn-danger" disabled={toRemove.size === 0} onClick={handleRemove}>
+                    <i className="fas fa-minus"></i> Desasociar
+                  </button>
+                </div>
+              </div>
+          )}
+        </div>
       </div>
-    </div>
   );
 }

@@ -46,16 +46,30 @@ namespace GymTec_api.Controllers
         {
             try
             {
-                if (_context.cliente.Find(id_cliente) == null)
+                var cliente = _context.cliente.Find(id_cliente);
+                if (cliente == null)
                     return NotFound(new { success = false, error = "Cliente no encontrado." });
-                if (_context.clase.Find(id_clase) == null)
+
+                var clase = _context.clase.Find(id_clase);
+                if (clase == null)
                     return NotFound(new { success = false, error = "Clase no encontrada." });
+
+                // Obtener la cantidad actual de inscritos en la clase
+                int inscritos = _context.clientexclase.Count(cxc => cxc.id_clase == id_clase);
+
+                if (inscritos >= clase.capacidad)
+                {
+                    return BadRequest(new { success = false, error = "La clase ya está llena. No hay cupos disponibles." });
+                }
+
+                // Insertar inscripción
                 _context.clientexclase.Add(new ClienteXClase
                 {
                     id_clase = id_clase,
                     id_cliente = id_cliente
                 });
                 _context.SaveChanges();
+
                 return Ok(new { success = true, mensaje = "Cliente inscrito en la clase correctamente." });
             }
             catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("duplicate") == true)
@@ -67,6 +81,7 @@ namespace GymTec_api.Controllers
                 return StatusCode(500, new { success = false, error = ex.Message });
             }
         }
+
 
 
         // DELETE : api/clientexclase/{id_clase}/{id_cliente}

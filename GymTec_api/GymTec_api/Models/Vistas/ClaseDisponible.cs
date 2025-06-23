@@ -2,6 +2,7 @@
 {
     public class ClaseDisponible
     {
+        public int id_clase { get; set; }
         public string nombre_servicio { get; set; }
         public bool es_grupal { get; set; }
         public string nombre_sucursal { get; set; }

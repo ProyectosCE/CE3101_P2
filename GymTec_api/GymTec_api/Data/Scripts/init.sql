@@ -254,6 +254,7 @@ ALTER TABLE telefonossucursal
 -- clases_disponibles
 CREATE OR REPLACE VIEW clases_disponibles AS
 SELECT
+	c.id_clase,
     s.descripcion AS nombre_servicio,
     c.grupal AS es_grupal,
     su.nombre_sucursal,
@@ -269,6 +270,7 @@ JOIN sucursal su ON c.id_sucursal = su.id_sucursal
 LEFT JOIN empleado e ON c.id_instructor = e.id_empleado
 LEFT JOIN clientexclase cxc ON c.id_clase = cxc.id_clase
 GROUP BY 
+	c.id_clase,
     s.descripcion, 
     c.grupal, 
     su.nombre_sucursal, 

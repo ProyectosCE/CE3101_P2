@@ -1,7 +1,6 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/router';
 import { API_BASE_URL } from '@/stores/api';
-import { API_URL } from '@/stores/api';
 
 interface User {
   id: number;
@@ -13,7 +12,11 @@ interface User {
 interface AuthContextProps {
   user: User | null;
   isAuthenticated: boolean;
-  login: (correo: string, contrasena: string, rol: 'ADMIN' | 'CLIENTE' | 'INSTRUCTOR') => Promise<void>;
+  login: (
+      correo: string,
+      contrasena: string,
+      rol: 'ADMIN' | 'CLIENTE' | 'INSTRUCTOR'
+  ) => Promise<void>;
   logout: () => void;
 }
 
@@ -42,9 +45,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       contrasena: string,
       rol: 'ADMIN' | 'CLIENTE' | 'INSTRUCTOR'
   ) => {
-
     try {
-      const response = await fetch(`${API_BASE_URL}/api/Auth/login`, {
+      const res = await fetch(`${API_BASE_URL}/api/Auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -54,40 +56,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }),
       });
 
-      const data = await response.json();
+      const data = await res.json();
+      console.log('[AuthContext] login response:', data);
 
-      if (response.status === 400) throw new Error(data.mensaje || 'Solicitud incorrecta (400)');
-      if (response.status === 404) throw new Error(data.mensaje || 'No encontrado (404)');
-      if (response.status === 401) throw new Error(data.mensaje || 'Credenciales inválidas (401)');
-      if (response.status === 500) throw new Error('Error interno del servidor (500)');
-      if (!response.ok || !data.succes) throw new Error(data.mensaje || 'Error desconocido');
+      // Chequeo de errores HTTP básicos
+      if (!res.ok) {
+        let msg = data.mensaje || `Error ${res.status}`;
+        throw new Error(msg);
+      }
 
+      // logn fue exitoso
       const nombre = data.cliente || data.empleado || 'Usuario';
       const id = data.id;
 
-      const nuevoUsuario: User = {
-        id,
-        nombre,
-        correo,
-        rol,
-      };
-
+      const nuevoUsuario: User = { id, nombre, correo, rol };
       setUser(nuevoUsuario);
       localStorage.setItem('gymtec_user', JSON.stringify(nuevoUsuario));
 
-      switch (rol) {
-        case 'ADMIN':
-          router.replace('/admin');
-          break;
-        case 'CLIENTE':
-          router.replace('/cliente');
-          break;
-        case 'INSTRUCTOR':
-          router.replace('/instructor');
-          break;
-      }
+      // Redirije
+      const rutas: Record<User['rol'], string> = {
+        ADMIN: '/admin',
+        CLIENTE: '/cliente',
+        INSTRUCTOR: '/instructor',
+      };
+      router.replace(rutas[rol]);
     } catch (err: any) {
-      console.error('Error en login:', err.message);
+      console.error('[AuthContext] login error:', err.message);
       throw err;
     }
   };

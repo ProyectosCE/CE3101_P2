@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/AdminPage.module.css';
-import {API_BASE_URL} from '@/stores/api';
+import { API_BASE_URL } from '@/stores/api';
 
 interface Branch {
   id_sucursal: number;
@@ -13,11 +13,12 @@ interface Branch {
   canton: string;
   distrito: string;
   horario_atencion: string;
+  fecha_apertura: string;
   capacidad_max: number;
   id_admin: number;
   spa_activo: boolean;
   tienda_activo: boolean;
-  telefonos: { id_telefono_sucursal: number, numero: string }[];
+  telefonos: { id_telefono_sucursal: number; numero: string }[];
 }
 
 export default function Branches() {
@@ -29,10 +30,16 @@ export default function Branches() {
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState({
-    nombre_sucursal: '', provincia: '', canton: '', distrito: '',
-    horario_atencion: '', capacidad_max: 0,
+    nombre_sucursal: '',
+    provincia: '',
+    canton: '',
+    distrito: '',
+    horario_atencion: '',
+    fecha_apertura: '',
+    capacidad_max: 0,
     id_admin: user?.id ?? 0,
-    spa_activo: false, tienda_activo: false,
+    spa_activo: false,
+    tienda_activo: false,
     telefonos: ['']
   });
 
@@ -73,8 +80,9 @@ export default function Branches() {
     setIsEditing(false);
     setEditingId(null);
     setForm({
-      nombre_sucursal: '', provincia: '', canton: '', distrito: '', horario_atencion: '', capacidad_max: 0,
-      id_admin: user?.id ?? 0, spa_activo: false, tienda_activo: false, telefonos: ['']
+      nombre_sucursal: '', provincia: '', canton: '', distrito: '', horario_atencion: '',
+      fecha_apertura: '', capacidad_max: 0, id_admin: user?.id ?? 0,
+      spa_activo: false, tienda_activo: false, telefonos: ['']
     });
     setShowModal(true);
   };
@@ -88,6 +96,7 @@ export default function Branches() {
       canton: branch.canton,
       distrito: branch.distrito,
       horario_atencion: branch.horario_atencion,
+      fecha_apertura: branch.fecha_apertura,
       capacidad_max: branch.capacidad_max,
       id_admin: branch.id_admin,
       spa_activo: branch.spa_activo,
@@ -120,6 +129,7 @@ export default function Branches() {
       const url = isEditing
           ? `${API_BASE_URL}/api/sucursal/${editingId}`
           : `${API_BASE_URL}/api/sucursal`;
+
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -129,6 +139,7 @@ export default function Branches() {
           canton: form.canton,
           distrito: form.distrito,
           horario_atencion: form.horario_atencion,
+          fecha_apertura: form.fecha_apertura,
           capacidad_max: form.capacidad_max,
           id_admin: form.id_admin,
           spa_activo: form.spa_activo,
@@ -139,7 +150,6 @@ export default function Branches() {
       if (!json.success) throw new Error(json.error);
 
       if (!isEditing) {
-        // Crear teléfonos si es nuevo
         const idSucursal = json.data.id_sucursal;
         for (const numero of form.telefonos) {
           await fetch(`${API_BASE_URL}/api/telefonossucursal/${idSucursal}`, {
@@ -161,6 +171,8 @@ export default function Branches() {
     logout();
     router.push('/login');
   };
+
+
 
   return (
       <div className={styles.pageContainer}>
@@ -192,23 +204,20 @@ export default function Branches() {
                         <i className={isEditing ? 'fas fa-edit' : 'fas fa-plus'}></i>{' '}
                         {isEditing ? 'Editar Sucursal' : 'Nueva Sucursal'}
                       </h5>
-                      <button
-                          type="button"
-                          className="btn-close"
-                          onClick={() => setShowModal(false)}
-                      />
+                      <button type="button" className="btn-close" onClick={() => setShowModal(false)} />
                     </div>
                     <div className="modal-body">
                       {/* Nombre */}
                       <div className="mb-2">
                         <label className="form-label">Nombre</label>
                         <input
-                            id="nombre"
+                            id="nombre_sucursal"
                             className="form-control"
-                            value={form.nombre}
+                            value={form.nombre_sucursal}
                             onChange={handleChange}
                         />
                       </div>
+
                       {/* Dirección */}
                       <div className="row g-2 mb-2">
                         <div className="col">
@@ -239,50 +248,43 @@ export default function Branches() {
                           />
                         </div>
                       </div>
-                      {/* Fecha y horario */}
-                      <div className="mb-2">
-                        <label className="form-label">Fecha Apertura</label>
-                        <input
-                            id="fechaApertura"
-                            type="date"
-                            className="form-control"
-                            value={form.fechaApertura}
-                            onChange={handleChange}
-                        />
-                      </div>
+
+                      {/* Horario */}
                       <div className="mb-2">
                         <label className="form-label">Horario Atención</label>
                         <input
-                            id="horarioAtencion"
+                            id="horario_atencion"
                             type="text"
                             className="form-control"
                             placeholder="08:00 - 20:00"
-                            value={form.horarioAtencion}
+                            value={form.horario_atencion}
                             onChange={handleChange}
                         />
                       </div>
+
                       {/* Capacidad */}
                       <div className="mb-2">
                         <label className="form-label">Capacidad Máx.</label>
                         <input
-                            id="capacidadMax"
+                            id="capacidad_max"
                             type="number"
                             className="form-control"
-                            value={form.capacidadMax}
+                            value={form.capacidad_max}
                             onChange={handleChange}
                             min={0}
                         />
                       </div>
+
                       {/* Teléfonos */}
                       <div className="mb-2">
                         <label className="form-label">Teléfonos</label>
-                        {form.telefonos.map((tel,i)=>(
+                        {form.telefonos.map((tel, i) => (
                             <input
                                 key={i}
                                 className="form-control mb-1"
                                 value={tel}
                                 placeholder="Ej: 88881234"
-                                onChange={e=>handlePhoneChange(i,e.target.value)}
+                                onChange={(e) => handlePhoneChange(i, e.target.value)}
                             />
                         ))}
                         <button
@@ -293,33 +295,31 @@ export default function Branches() {
                           <i className="fas fa-phone-plus"></i> Agregar teléfono
                         </button>
                       </div>
+
                       {/* Spa/Tienda */}
                       <div className="form-check form-switch mb-2">
                         <input
-                            id="spaActivo"
+                            id="spa_activo"
                             type="checkbox"
                             className="form-check-input"
-                            checked={form.spaActivo}
+                            checked={form.spa_activo}
                             onChange={handleChange}
                         />
                         <label className="form-check-label">Spa Activo</label>
                       </div>
                       <div className="form-check form-switch">
                         <input
-                            id="tiendaActivo"
+                            id="tienda_activo"
                             type="checkbox"
                             className="form-check-input"
-                            checked={form.tiendaActivo}
+                            checked={form.tienda_activo}
                             onChange={handleChange}
                         />
                         <label className="form-check-label">Tienda Activa</label>
                       </div>
                     </div>
                     <div className="modal-footer">
-                      <button
-                          className="btn btn-secondary"
-                          onClick={() => setShowModal(false)}
-                      >
+                      <button className="btn btn-secondary" onClick={() => setShowModal(false)}>
                         <i className="fas fa-times"></i> Cancelar
                       </button>
                       <button className="btn btn-primary" onClick={handleSave}>
@@ -339,7 +339,6 @@ export default function Branches() {
                 <th>ID</th>
                 <th>Nombre</th>
                 <th>Dirección</th>
-                <th>Apertura</th>
                 <th>Horario</th>
                 <th>Capacidad</th>
                 <th>Teléfonos</th>
@@ -349,24 +348,27 @@ export default function Branches() {
               </tr>
               </thead>
               <tbody>
-              {branches.map(b => (
-                  <tr key={b.id}>
-                    <td>{b.id}</td>
-                    <td>{b.nombre}</td>
+              {branches.map((b) => (
+                  <tr key={b.id_sucursal}>
+                    <td>{b.id_sucursal}</td>
+                    <td>{b.nombre_sucursal}</td>
                     <td>{`${b.provincia}, ${b.canton}, ${b.distrito}`}</td>
-                    <td>{b.fechaApertura}</td>
-                    <td>{b.horarioAtencion}</td>
-                    <td>{b.capacidadMax}</td>
-                    <td>{b.telefonos.join(', ')}</td>
+                    <td>{b.horario_atencion}</td>
+                    <td>{b.capacidad_max}</td>
+                    <td>{b.telefonos.map((t) => t.numero).join(', ')}</td>
                     <td>
-                      {b.spaActivo
-                          ? <i className="fas fa-check text-success" />
-                          : <i className="fas fa-times text-danger" />}
+                      {b.spa_activo ? (
+                          <i className="fas fa-check text-success" />
+                      ) : (
+                          <i className="fas fa-times text-danger" />
+                      )}
                     </td>
                     <td>
-                      {b.tiendaActivo
-                          ? <i className="fas fa-check text-success" />
-                          : <i className="fas fa-times text-danger" />}
+                      {b.tienda_activo ? (
+                          <i className="fas fa-check text-success" />
+                      ) : (
+                          <i className="fas fa-times text-danger" />
+                      )}
                     </td>
                     <td>
                       <button
@@ -377,7 +379,7 @@ export default function Branches() {
                       </button>
                       <button
                           className="btn btn-sm btn-outline-danger"
-                          onClick={() => handleDelete(b.id)}
+                          onClick={() => handleDelete(b.id_sucursal)}
                       >
                         <i className="fas fa-trash"></i>
                       </button>
@@ -390,4 +392,5 @@ export default function Branches() {
         </div>
       </div>
   );
+
 }

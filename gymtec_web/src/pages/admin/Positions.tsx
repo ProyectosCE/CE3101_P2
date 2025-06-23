@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/AdminPage.module.css';
+import { API_BASE_URL } from '@/stores/api';
 
 interface Position {
   id_puesto: number;
@@ -25,7 +26,7 @@ export default function Positions() {
 
   const fetchPositions = async () => {
     try {
-      const res = await fetch('/api/puesto');
+      const res = await fetch(`${API_BASE_URL}/api/puesto`);
       const json = await res.json();
       if (!json.success) throw new Error(json.error);
       setPositions(json.data);
@@ -59,7 +60,7 @@ export default function Positions() {
   const handleDelete = async (id: number) => {
     if (!confirm('¿Confirma eliminación de este puesto?')) return;
     try {
-      const res = await fetch(`/api/puesto/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE_URL}/api/puesto/${id}`, { method: 'DELETE' });
       const json = await res.json();
       if (!json.success) throw new Error(json.error);
       fetchPositions();
@@ -80,7 +81,7 @@ export default function Positions() {
       is_default: false
     };
     try {
-      const res = await fetch(editing ? `/api/puesto/${editing.id_puesto}` : '/api/puesto', {
+      const res = await fetch(editing ? `${API_BASE_URL}/api/puesto/${editing.id_puesto}` : '/api/puesto', {
         method: editing ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)

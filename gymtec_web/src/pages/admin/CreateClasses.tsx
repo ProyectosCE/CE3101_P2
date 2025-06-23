@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/AdminPage.module.css';
+import { API_BASE_URL } from '@/stores/api';
 
 interface Service {
   id_servicio: number;
@@ -40,7 +41,7 @@ export default function CreateClasses() {
   const [horaFin, setHoraFin] = useState<string>('');
 
   useEffect(() => {
-    fetch('/api/servicio')
+    fetch(`${API_BASE_URL}/api/servicio`)
         .then(res => res.json())
         .then(data => {
           if (data.success) setServices(data.data);
@@ -48,7 +49,7 @@ export default function CreateClasses() {
         })
         .catch(() => alert('Error de servidor al cargar servicios'));
 
-    fetch('/api/empleado/instructores')
+    fetch(`${API_BASE_URL}/api/empleado/instructores`)
         .then(res => res.json())
         .then(data => {
           if (data.success) setInstructors(data.data);
@@ -87,7 +88,7 @@ export default function CreateClasses() {
     };
 
     try {
-      const res = await fetch('/api/clase', {
+      const res = await fetch(`${API_BASE_URL}/api/clase`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nuevaClase)

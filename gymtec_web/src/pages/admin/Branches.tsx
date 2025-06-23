@@ -140,7 +140,7 @@ export default function Branches() {
         // Crear teléfonos si es nuevo
         const idSucursal = json.data.id_sucursal;
         for (const numero of form.telefonos) {
-          await fetch(`/api/telefonossucursal/${idSucursal}`, {
+          await fetch(`${API_BASE_URL}/api/telefonossucursal/${idSucursal}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ numero })

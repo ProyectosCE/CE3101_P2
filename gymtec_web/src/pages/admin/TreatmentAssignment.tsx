@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/AdminPage.module.css';
+import { API_BASE_URL } from '@/stores/api';
 
 interface Branch {
   id_sucursal: number;
@@ -29,7 +30,7 @@ export default function TreatmentAssignment() {
   const [toRemove, setToRemove] = useState<Set<number>>(new Set());
 
   useEffect(() => {
-    fetch('/api/sucursal')
+    fetch('${API_BASE_URL}/api/sucursal')
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -40,7 +41,7 @@ export default function TreatmentAssignment() {
         })
         .catch(() => alert('Error de conexión al cargar sucursales'));
 
-    fetch('/api/tratamiento')
+    fetch(`${API_BASE_URL}/api/tratamiento`)
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -59,7 +60,7 @@ export default function TreatmentAssignment() {
     setToRemove(new Set());
 
     if (id) {
-      fetch(`/api/sucursalxtratamiento/${id}`)
+      fetch(`\`\`/api/sucursalxtratamiento/${id}`)
           .then(res => res.json())
           .then(data => {
             if (data.success) {

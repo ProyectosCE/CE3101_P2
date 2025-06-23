@@ -55,11 +55,21 @@ export default function RegisterClassPage() {
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { id, value, type, checked } = e.target;
-    setForm(prev => ({
-      ...prev,
-      [id]: type === 'checkbox' ? checked : value
-    }));
+    const target = e.target;
+    const id = target.id;
+    const value = target.value;
+    
+    if (target instanceof HTMLInputElement && target.type === 'checkbox') {
+      setForm(prev => ({
+        ...prev,
+        [id]: target.checked
+      }));
+    } else {
+      setForm(prev => ({
+        ...prev,
+        [id]: value
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

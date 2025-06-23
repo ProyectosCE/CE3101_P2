@@ -40,6 +40,9 @@ const eslintConfig = [
       // Permitir elemento head
       "@next/next/no-head-element": "off",
 
+      // Permitir let aunque no se reasigne
+      "prefer-const": "off",
+
       // Desactivar reglas de dependencias de hooks
       "react/hook-use-state": "off",
       "react/jsx-key": "off",

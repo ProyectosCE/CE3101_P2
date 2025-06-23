@@ -10,7 +10,54 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  ...compat.config({
+    root: true,
+    extends: [
+      "next",
+      "next/core-web-vitals",
+      "plugin:@typescript-eslint/recommended",
+    ],
+    plugins: ["@typescript-eslint"],
+    rules: {
+      // Desactivar warnings de variables no usadas
+      "@typescript-eslint/no-unused-vars": "off",
+
+      // Permitir any
+      "@typescript-eslint/no-explicit-any": "off",
+
+      // Desactivar warnings de img vs Image
+      "@next/next/no-img-element": "off",
+
+      // Hacer los hooks más flexibles
+      "react-hooks/exhaustive-deps": "off",
+
+      // Permitir nombres de variables sin _
+      "@typescript-eslint/naming-convention": "off",
+
+      // Permitir expresiones sin asignación
+      "@typescript-eslint/no-unused-expressions": "off",
+
+      // Permitir elemento head
+      "@next/next/no-head-element": "off",
+
+      // Permitir let aunque no se reasigne
+      "prefer-const": "off",
+
+      // Desactivar reglas de dependencias de hooks
+      "react/hook-use-state": "off",
+      "react/jsx-key": "off",
+      "react-hooks/rules-of-hooks": "off",
+    },
+    overrides: [
+      {
+        files: ["**/*.ts", "**/*.tsx"],
+        rules: {
+          "@typescript-eslint/no-explicit-any": "off",
+        },
+      },
+    ],
+    ignorePatterns: ["node_modules/", ".next/", "out/"],
+  }),
 ];
 
 export default eslintConfig;

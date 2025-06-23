@@ -16,57 +16,57 @@ export default function Sidebar() {
         {role === 'ADMIN' && (
           <>
             <li className="nav-item mb-2">
-              <Link href="/admin/dashboard" className="nav-link text-white">
+              <Link href="/admin/Dashboard" className="nav-link text-white">
                 Dashboard
               </Link>
             </li>
             <li className="nav-item mb-2">
-              <Link href="/admin/branches" className="nav-link text-white">
+              <Link href="/admin/Branches" className="nav-link text-white">
                 Branches
               </Link>
             </li>
             <li className="nav-item mb-2">
-              <Link href="/admin/employees" className="nav-link text-white">
+              <Link href="/admin/Employees" className="nav-link text-white">
                 Employees
               </Link>
             </li>
             <li className="nav-item mb-2">
-              <Link href="/admin/services" className="nav-link text-white">
+              <Link href="/admin/Services" className="nav-link text-white">
                 Services
               </Link>
             </li>
             <li className="nav-item mb-2">
-              <Link href="/admin/equipment-types" className="nav-link text-white">
+              <Link href="/admin/EquipmentTypes" className="nav-link text-white">
                 Equipment Types
               </Link>
             </li>
             <li className="nav-item mb-2">
-              <Link href="/admin/inventory" className="nav-link text-white">
+              <Link href="/admin/Inventory" className="nav-link text-white">
                 Inventory
               </Link>
             </li>
             <li className="nav-item mb-2">
-              <Link href="/admin/products" className="nav-link text-white">
+              <Link href="/admin/Products" className="nav-link text-white">
                 Products
               </Link>
             </li>
             <li className="nav-item mb-2">
-              <Link href="/admin/group-classes" className="nav-link text-white">
+              <Link href="/admin/GroupClasses" className="nav-link text-white">
                 Group Classes
               </Link>
             </li>
             <li className="nav-item mb-2">
-              <Link href="/admin/generate-payroll" className="nav-link text-white">
+              <Link href="/admin/GeneratePayroll" className="nav-link text-white">
                 Generate Payroll
               </Link>
             </li>
             <li className="nav-item mb-2">
-              <Link href="/admin/copy-calendar" className="nav-link text-white">
+              <Link href="/admin/CopyCalendar" className="nav-link text-white">
                 Copy Calendar
               </Link>
             </li>
             <li className="nav-item mb-2">
-              <Link href="/admin/copy-gym" className="nav-link text-white">
+              <Link href="/admin/CopyGym" className="nav-link text-white">
                 Copy Gym
               </Link>
             </li>

@@ -8,7 +8,6 @@ import { useRouter } from 'next/router';
 import { useAuth } from '../hooks/useAuth';
 import { useEffect } from 'react';
 import Header from '../components/Layout/Header';
-import Sidebar from '../components/Layout/SideBar';
 import Spinner from '../components/Common/Spinner';
 
 function AppWrapper({ Component, pageProps }: AppProps) {
@@ -20,32 +19,26 @@ function AppWrapper({ Component, pageProps }: AppProps) {
   const ruta = router.pathname;
 
   useEffect(() => {
-    // Se definen rutas siempre públicas (login, registro cliente y dashboards de instructor/cliente/admin)
+    // Se definen rutas siempre públicas (login y registro cliente)
     const alwaysPublic = [
       '/login',
       '/cliente/Register',
-      '/instructor/Dashboard',
-      '/cliente/Dashboard',
-      '/admin/Dashboard'
     ];
+
     // Se permite acceso a cualquier ruta bajo /instructor, /cliente o /admin
     const isInstructorRoute = ruta.startsWith('/instructor');
     const isClienteRoute    = ruta.startsWith('/cliente');
     const isAdminRoute      = ruta.startsWith('/admin');
 
-    // Si no está autenticado y la ruta NO es pública ni de instructor/cliente/admin, redirige a /login
-    if (
-      !isAuthenticated &&
-      !alwaysPublic.includes(ruta) &&
-      !isInstructorRoute &&
-      !isClienteRoute &&
-      !isAdminRoute
-    ) {
+    // Si no está autenticado y la ruta NO es pública, redirige a /login
+    if (!isAuthenticated && !alwaysPublic.includes(ruta)) {
       router.replace('/login');
+      return;
     }
 
-    // Si está autenticado y está en /login, redirige al dashboard según rol
-    if (isAuthenticated && ruta === '/login') {
+    // Si está autenticado y está en una ruta base, login o home, redirige al dashboard según rol
+    if (isAuthenticated && (ruta === '/login' || ruta === '/admin' || ruta === '/cliente' || 
+        ruta === '/instructor' || ruta === '/')) {
       switch (user?.rol) {
         case 'ADMIN':
           router.replace('/admin/Dashboard');
@@ -57,7 +50,16 @@ function AppWrapper({ Component, pageProps }: AppProps) {
           router.replace('/instructor/Dashboard');
           break;
         default:
-          router.replace('/');
+          router.replace('/login');
+      }
+    }
+
+    // Verificar que el usuario tenga acceso a la ruta según su rol
+    if (isAuthenticated && user) {
+      if ((isAdminRoute && user.rol !== 'ADMIN') ||
+          (isClienteRoute && user.rol !== 'CLIENTE') ||
+          (isInstructorRoute && user.rol !== 'INSTRUCTOR')) {
+        router.replace(`/${user.rol.toLowerCase()}/Dashboard`);
       }
     }
   }, [isAuthenticated, ruta, router, user]);
@@ -76,9 +78,8 @@ function AppWrapper({ Component, pageProps }: AppProps) {
 
   return (
     <>
-      {/* Se muestra Header y Sidebar únicamente si el usuario está autenticado */}
+      {/* Se muestra Header únicamente si el usuario está autenticado */}
       {isAuthenticated && <Header />}
-      {isAuthenticated && <Sidebar />}
       <Component {...pageProps} />
     </>
   );

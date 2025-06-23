@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/InstructorPage.module.css';
+import { API_URL } from '@/stores/api';
 
 interface Cliente {
   id_cliente: number;
@@ -32,7 +33,6 @@ export default function CreateWorkPlanPage() {
   const [createdPlans, setCreatedPlans] = useState<PlanTrabajo[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
     const fetchClientes = async () => {

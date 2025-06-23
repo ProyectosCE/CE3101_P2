@@ -1,5 +1,7 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/router';
+import { API_BASE_URL } from '@/stores/api';
+import { API_URL } from '@/stores/api';
 
 interface User {
   id: number;
@@ -40,10 +42,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       contrasena: string,
       rol: 'ADMIN' | 'CLIENTE' | 'INSTRUCTOR'
   ) => {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
     try {
-      const response = await fetch(`${API_URL}/api/Auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/Auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/AdminPage.module.css';
-
+import { API_URL } from '@/stores/api';
 interface Branch {
   id: number;
   nombre: string;
@@ -36,7 +36,6 @@ export default function CopyGymPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [classes, setClasses] = useState<Clase[]>([]);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
     const fetchBranches = async () => {

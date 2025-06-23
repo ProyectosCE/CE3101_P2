@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/AdminPage.module.css';
+import { API_URL } from '@/stores/api';
 
 interface Treatment {
   id_tratamiento: number;
@@ -13,7 +14,6 @@ interface Treatment {
 export default function SpaTreatments() {
   const { logout } = useAuth();
   const router = useRouter();
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
   const [treatments, setTreatments] = useState<Treatment[]>([]);
   const [showModal, setShowModal] = useState(false);

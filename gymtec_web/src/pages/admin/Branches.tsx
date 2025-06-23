@@ -77,7 +77,11 @@ export default function Branches() {
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { id, value, type, checked } = e.target;
+    const { id, value, type } = e.target;
+    let checked = false;
+    if (type === 'checkbox') {
+      checked = (e.target as HTMLInputElement).checked;
+    }
     setForm(prev => ({
       ...prev,
       [id]: type === 'checkbox' ? checked : id === 'capacidad_max' ? Number(value) : value,
@@ -131,8 +135,29 @@ export default function Branches() {
   };
 
   const handleSave = async () => {
-    if (!form.nombre_sucursal || !form.provincia || !form.horario_atencion || !form.fecha_apertura) {
-      alert('Complete todos los campos obligatorios.');
+    const requiredFields = {
+      nombre_sucursal: form.nombre_sucursal.trim(),
+      provincia: form.provincia.trim(),
+      canton: form.canton.trim(),
+      distrito: form.distrito.trim(),
+      horario_atencion: form.horario_atencion.trim(),
+      fecha_apertura: form.fecha_apertura,
+      capacidad_max: form.capacidad_max,
+      id_admin: form.id_admin,
+      spa_activo: form.spa_activo,
+      tienda_activo: form.tienda_activo
+    };
+
+    const emptyFields = Object.entries(requiredFields)
+      .filter(([key, value]) => {
+        if (typeof value === 'string') return !value;
+        if (typeof value === 'number') return value <= 0;
+        return false;
+      })
+      .map(([key]) => key);
+
+    if (emptyFields.length > 0) {
+      alert(`Por favor complete los siguientes campos: ${emptyFields.join(', ')}`);
       return;
     }
 
@@ -140,47 +165,20 @@ export default function Branches() {
       const method = isEditing ? 'PATCH' : 'POST';
       const url = isEditing ? `${API_BASE_URL}/api/sucursal/${editingId}` : `${API_BASE_URL}/api/sucursal`;
 
-      let bodyPayload;
-
-      if (isEditing) {
-        // PATCH con la estructura actual (seguramente la API acepta este formato)
-        bodyPayload = {
-          id_sucursal: editingId!,
-          nombre_sucursal: form.nombre_sucursal,
-          provincia: form.provincia,
-          canton: form.canton,
-          distrito: form.distrito,
-          horario_atencion: form.horario_atencion,
-          fecha_apertura: form.fecha_apertura,
-          capacidad_max: form.capacidad_max,
-          id_admin: form.id_admin,
-          spa_activo: form.spa_activo,
-          tienda_activo: form.tienda_activo,
-          telefonos: [],
-        };
-      } else {
-        // POST: enviar propiedades directamente (sin "nuevaSucursal")
-        bodyPayload = {
-          nombre_sucursal: form.nombre_sucursal,
-          provincia: form.provincia,
-          canton: form.canton,
-          distrito: form.distrito,
-          horario_atencion: form.horario_atencion,
-          fecha_apertura: form.fecha_apertura,
-          capacidad_max: form.capacidad_max,
-          id_admin: form.id_admin,
-          spa_activo: form.spa_activo,
-          tienda_activo: form.tienda_activo,
-          telefonos: [],
-        };
-      }
-
+      const bodyPayload = isEditing 
+        ? { ...requiredFields, id_sucursal: editingId }
+        : requiredFields;
 
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyPayload),
       });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(JSON.stringify(errorData.errors || errorData.error || 'Error desconocido'));
+      }
 
       const json = await res.json();
       if (!json.success) throw new Error(json.error);
@@ -196,6 +194,28 @@ export default function Branches() {
     logout();
     router.push('/login');
   };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm('¿Está seguro que desea eliminar esta sucursal?')) return;
+    
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/sucursal/${id}`, {
+        method: 'DELETE',
+      });
+      
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Error al eliminar la sucursal');
+      }
+      
+      fetchBranches();
+    } catch (err: any) {
+      alert('Error: ' + err.message);
+    }
+  };
+
+  // Helper function to check if branch is default
+  const isDefaultBranch = (id: number) => id <= 3;
 
   return (
     <div className={styles.pageContainer}>
@@ -387,8 +407,18 @@ export default function Branches() {
                     <button
                       className="btn btn-sm btn-outline-secondary me-1"
                       onClick={() => openEditModal(b)}
+                      disabled={isDefaultBranch(b.id_sucursal)}
+                      title={isDefaultBranch(b.id_sucursal) ? 'No se puede editar una sucursal por defecto' : ''}
                     >
                       <i className="fas fa-edit"></i>
+                    </button>
+                    <button
+                      className="btn btn-sm btn-outline-danger"
+                      onClick={() => handleDelete(b.id_sucursal)}
+                      disabled={isDefaultBranch(b.id_sucursal)}
+                      title={isDefaultBranch(b.id_sucursal) ? 'No se puede eliminar una sucursal por defecto' : ''}
+                    >
+                      <i className="fas fa-trash"></i>
                     </button>
                   </td>
                 </tr>

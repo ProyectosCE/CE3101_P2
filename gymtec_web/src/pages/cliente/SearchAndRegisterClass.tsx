@@ -70,7 +70,7 @@ export default function SearchAndRegisterClass() {
         const updated = await res.json();
         if (updated.success) {
           setClases(updated.data);
-          const result = updated.data.filter(c => {
+          const result = updated.data.filter((c: any) => {
             const fechaClase = c.fecha.split('T')[0];
             return (
               (!sucursal || c.nombre_sucursal === sucursal) &&

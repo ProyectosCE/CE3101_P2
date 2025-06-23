@@ -130,8 +130,222 @@ export default function ClienteRegisterPage() {
           <img src="/logo.png" alt="Logo GymTEC" className={styles.loginLogo} />
           <h3>Registro de Cliente</h3>
           <form onSubmit={handleSubmit}>
-            {/* Resto del formulario permanece igual */}
-            {/* ... */}
+            {/* Cédula */}
+            <div className={`${styles.inputGroup} input-group`}>
+            <span className={styles.inputGroupText}>
+              <i className="fas fa-id-card"></i>
+            </span>
+              <input
+                  type="text"
+                  id="cedula"
+                  className={`form-control ${styles.formControl}`}
+                  placeholder="Cédula"
+                  maxLength={9}
+                  pattern="\d*"
+                  inputMode="numeric"
+                  value={formData.cedula}
+                  onChange={handleChange}
+                  required
+              />
+            </div>
+
+            {/* Nombres */}
+            <div className={`${styles.inputGroup} input-group`}>
+            <span className={styles.inputGroupText}>
+              <i className="fas fa-user"></i>
+            </span>
+              <input
+                  type="text"
+                  id="nombres"
+                  className={`form-control ${styles.formControl}`}
+                  placeholder="Nombres"
+                  pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s]+"
+                  value={formData.nombres}
+                  onChange={handleChange}
+                  required
+              />
+            </div>
+
+            {/* Apellidos */}
+            <div className={`${styles.inputGroup} input-group`}>
+            <span className={styles.inputGroupText}>
+              <i className="fas fa-user"></i>
+            </span>
+              <input
+                  type="text"
+                  id="apellidos"
+                  className={`form-control ${styles.formControl}`}
+                  placeholder="Apellidos"
+                  pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s]+"
+                  value={formData.apellidos}
+                  onChange={handleChange}
+                  required
+              />
+            </div>
+
+            {/* Edad */}
+            <div className={`${styles.inputGroup} input-group`}>
+            <span className={styles.inputGroupText}>
+              <i className="fas fa-birthday-cake"></i>
+            </span>
+              <input
+                  type="number"
+                  id="edad"
+                  className={`form-control ${styles.formControl}`}
+                  placeholder="Edad"
+                  min={1}
+                  max={100}
+                  value={formData.edad}
+                  onChange={handleChange}
+                  required
+              />
+            </div>
+
+            {/* Fecha de nacimiento */}
+            <div className={`${styles.inputGroup} input-group`}>
+            <span className={styles.inputGroupText}>
+              <i className="fas fa-calendar-alt"></i>
+            </span>
+              <input
+                  type="date"
+                  id="fechaNacimiento"
+                  className={`form-control ${styles.formControl}`}
+                  value={formData.fechaNacimiento}
+                  onChange={handleChange}
+                  required
+              />
+            </div>
+
+            {/* Peso */}
+            <div className={`${styles.inputGroup} input-group`}>
+            <span className={styles.inputGroupText}>
+              <i className="fas fa-weight"></i>
+            </span>
+              <input
+                  type="number"
+                  id="peso"
+                  className={`form-control ${styles.formControl}`}
+                  placeholder="Peso (kg)"
+                  min={1}
+                  step="0.1"
+                  value={formData.peso}
+                  onChange={handleChange}
+                  required
+              />
+            </div>
+
+            {/* IMC */}
+            <div className={`${styles.inputGroup} input-group`}>
+            <span className={styles.inputGroupText}>
+              <i className="fas fa-calculator"></i>
+            </span>
+              <input
+                  type="number"
+                  id="imc"
+                  className={`form-control ${styles.formControl}`}
+                  placeholder="IMC"
+                  min={0}
+                  step="0.1"
+                  value={formData.imc}
+                  onChange={handleChange}
+                  required
+              />
+            </div>
+
+            {/* Provincia, Cantón, Distrito */}
+            <div className="row g-3">
+              <div className="col-md-4">
+                <div className={`${styles.inputGroup} input-group`}>
+                <span className={styles.inputGroupText}>
+                  <i className="fas fa-map-marked-alt"></i>
+                </span>
+                  <input
+                      type="text"
+                      id="provincia"
+                      className={`form-control ${styles.formControl}`}
+                      placeholder="Provincia"
+                      pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s]+"
+                      value={formData.provincia}
+                      onChange={handleChange}
+                      required
+                  />
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className={`${styles.inputGroup} input-group`}>
+                <span className={styles.inputGroupText}>
+                  <i className="fas fa-map-pin"></i>
+                </span>
+                  <input
+                      type="text"
+                      id="canton"
+                      className={`form-control ${styles.formControl}`}
+                      placeholder="Cantón"
+                      pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s]+"
+                      value={formData.canton}
+                      onChange={handleChange}
+                      required
+                  />
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className={`${styles.inputGroup} input-group`}>
+                <span className={styles.inputGroupText}>
+                  <i className="fas fa-map"></i>
+                </span>
+                  <input
+                      type="text"
+                      id="distrito"
+                      className={`form-control ${styles.formControl}`}
+                      placeholder="Distrito"
+                      pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s]+"
+                      value={formData.distrito}
+                      onChange={handleChange}
+                      required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Correo electrónico */}
+            <div className={`${styles.inputGroup} input-group`}>
+            <span className={styles.inputGroupText}>
+              <i className="fas fa-envelope"></i>
+            </span>
+              <input
+                  type="email"
+                  id="correo"
+                  className={`form-control ${styles.formControl}`}
+                  placeholder="Correo electrónico"
+                  value={formData.correo}
+                  onChange={handleChange}
+                  required
+              />
+            </div>
+
+            {/* Contraseña */}
+            <div className={`${styles.inputGroup} input-group`}>
+            <span className={styles.inputGroupText}>
+              <i className="fas fa-lock"></i>
+            </span>
+              <input
+                  type="password"
+                  id="password"
+                  className={`form-control ${styles.formControl}`}
+                  placeholder="Contraseña"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+              />
+            </div>
+
+            {/* Botón de registro */}
+            <button
+                type="submit"
+                className={`btn btn-success w-100 ${styles.loginBtn}`}
+            >
+              <i className="fas fa-user-plus"></i> Registrar
+            </button>
           </form>
         </div>
       </div>

@@ -30,7 +30,7 @@ export default function TreatmentAssignment() {
   const [toRemove, setToRemove] = useState<Set<number>>(new Set());
 
   useEffect(() => {
-    fetch('${API_BASE_URL}/api/sucursal')
+    fetch(`${API_BASE_URL}/api/sucursal`)
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -60,7 +60,7 @@ export default function TreatmentAssignment() {
     setToRemove(new Set());
 
     if (id) {
-      fetch(`\`\`/api/sucursalxtratamiento/${id}`)
+      fetch(`${API_BASE_URL}/api/sucursalxtratamiento/${id}`)
           .then(res => res.json())
           .then(data => {
             if (data.success) {
@@ -80,7 +80,7 @@ export default function TreatmentAssignment() {
 
     for (const idTratamiento of newAssoc) {
       try {
-        const res = await fetch(`/api/sucursalxtratamiento/${selectedSpaId}/${idTratamiento}`, {
+        const res = await fetch(`${API_BASE_URL}/api/sucursalxtratamiento/${selectedSpaId}/${idTratamiento}`, {
           method: 'POST'
         });
         const data = await res.json();
@@ -99,7 +99,7 @@ export default function TreatmentAssignment() {
 
     for (const idTratamiento of toRemoveList) {
       try {
-        const res = await fetch(`/api/sucursalxtratamiento/${selectedSpaId}/${idTratamiento}`, {
+        const res = await fetch(`${API_BASE_URL}/api/sucursalxtratamiento/${selectedSpaId}/${idTratamiento}`, {
           method: 'DELETE'
         });
         const data = await res.json();

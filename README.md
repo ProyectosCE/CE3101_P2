@@ -16,7 +16,7 @@
 
 #### Profesor
 
-- Marco Rivera Meneses <jgonzalez@itcr.ac.cr>
+- Marco Rivera Meneses <marivera@itcr.ac.cr>
 
 ---
 

@@ -28,10 +28,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowNginx", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "https://nginxtest.itcrdev.xyz")
+        policy.AllowAnyOrigin()
               .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
+              .AllowAnyHeader();
     });
 });
 

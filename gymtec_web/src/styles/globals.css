@@ -1,0 +1,72 @@
+/* 1. Importar Bootstrap en primer lugar */
+@import url('bootstrap/dist/css/bootstrap.min.css');
+
+/* 2. Tus variables de color (modo claro/oscuro) */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+/* 3. Resets y reglas globales existentes */
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+/* 4. Ajuste para contenido principal cuando exista un sidebar */
+main {
+  margin-left: 200px;
+  padding: 20px;
+}
+
+/* 5. Compatibilidad: evitar que los inputs/descripciones de formulario hereden colores ilegibles */
+input,
+button,
+textarea,
+select {
+  background-color: #fff;
+  color: #000;
+}
+
+@media (prefers-color-scheme: dark) {
+  input,
+  button,
+  textarea,
+  select {
+    background-color: #222;
+    color: #fff;
+  }
+}

@@ -1,0 +1,109 @@
+/* src/styles/login.module.css */
+
+/* Se define el contenedor de pantalla completa con degradado: azul medio → azul claro */
+.loginPage {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0066cc 0%, #ccf0ff 100%);
+}
+
+/* Se ajusta la tarjeta de login: fondo azul claro, bordes redondeados, sombra y mayor anchura */
+.loginCard {
+  background-color: #ccf0ff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 420px;   /* Se amplía para evitar que los campos queden cortados */
+  text-align: center;
+}
+
+/*  Se ajusta la tarjeta de registro: fondo azul claro, bordes redondeados, sombra y anchura ampliada */
+.registerCard {
+  background-color: #ccf0ff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 500px;  /* Se amplía notablemente para acomodar todos los campos */
+  text-align: center;
+  margin: 0 auto;
+}
+
+/* Se establece el logo en la parte superior de la tarjeta (tamaño reducido) */
+.loginLogo {
+  max-width: 140px;
+  margin-bottom: 1.5rem;
+}
+
+/* Se define el estilo del título dentro de la tarjeta de registro */
+.registerCard h3 {
+  color: #000;               /* Se fija el color negro para el título */
+  margin-bottom: 1rem;       /* Se ajusta el espacio inferior */
+  font-size: 1.25rem;        /* Se establece un tamaño de fuente ligeramente mayor */
+}
+
+/* Se reduce el margen inferior de los grupos de input */
+.inputGroup {
+  margin-bottom: 0.75rem;
+}
+
+/*  Se configura el span que contiene el ícono: fondo gris claro y bordes */
+.inputGroupText {
+  background-color: #e6f2ff;
+  border: 1px solid #b0c4de;
+  border-right: 0;
+  border-radius: 0.25rem 0 0 0.25rem;
+  width: 2.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+/* Se ajusta el input para unificar bordes con el ícono */
+.formControl {
+  border: 1px solid #b0c4de;
+  border-left: 0;
+  border-radius: 0 0.25rem 0.25rem 0;
+  padding-left: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* Se estiliza el toggle de mostrar/ocultar contraseña */
+.passwordToggle {
+  background-color: #e6f2ff;
+  border: 1px solid #b0c4de;
+  border-left: 0;
+  border-radius: 0 0.25rem 0.25rem 0;
+  width: 2.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #555;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* Se define el botón de “Entrar” y “Registrar”: color, tamaño compacto */
+.loginBtn {
+  background-color: #004c99;
+  border: none;
+  font-weight: 500;
+  padding: 0.6rem;
+  font-size: 0.95rem;
+  color: #ffffff;
+}
+
+/*Se configura el estado hover del botón de “Entrar”/“Registrar” */
+.loginBtn:hover {
+  background-color: #003366;
+}
+
+/* Se ajusta el estilo del mensaje de error */
+.loginError {
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+  text-align: left;
+}

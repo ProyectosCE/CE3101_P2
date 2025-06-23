@@ -1,0 +1,202 @@
+/* ==== FONDO GLOBAL (ligero degradado) ==== */
+.pageContainer {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e0f7fa 0%, #ffffff 100%);
+  padding-top: 100px; /* espacio para logo y botones */
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333333;
+}
+
+/* ==== LOGO CENTRADO EN LA PARTE SUPERIOR ==== */
+.logoContainer {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 0;
+}
+.logoImage {
+  max-width: 200px;
+  height: auto;
+  display: block;
+}
+
+/* ==== BOTÓN “INICIO” / “CONFIGURACIÓN” ==== */
+.homeButton {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  background-color: #2575fc;
+  border: none;
+  color: #ffffff;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  z-index: 1;
+}
+.homeButton:hover {
+  background-color: #1b5ccb;
+}
+
+/* ==== BOTÓN “CERRAR SESIÓN” ==== */
+.logoutButton {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+  background-color: #dc3545;
+  border: none;
+  color: #ffffff;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  z-index: 1;
+}
+.logoutButton:hover {
+  background-color: #c82333;
+}
+
+/* ==== ENCABEZADOS ==== */
+.mainHeader {
+  margin-top: 40px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.mainHeader i {
+  margin-right: 0.4rem;
+  color: #2575fc;
+}
+.subHeader {
+  font-size: 1rem;
+  color: #555;
+  margin: 0.5rem auto 1.5rem;
+  max-width: 600px;
+  text-align: center;
+}
+
+/* ==== CONTENEDOR DE SECCIÓN GESTIÓN ==== */
+.sectionContainer {
+  background-color: #ffffff;
+  border: 2px solid #6ecff6;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 1rem;     /* más compacto */
+  margin-top: 1.5rem;
+}
+
+/* ==== CUADRÍCULA DE TARJETAS ==== */
+.cardsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 columnas fijas */
+  gap: 1rem;                             /* menos espacio */
+  justify-items: center;                /* centra cada tarjeta */
+  margin-top: 1rem;
+}
+
+.cardCustom {
+  background-color: #ffffff;
+  border: 2px solid #6ecff6;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 260px;    /* ligeramente más estrecha */
+  height: 260px;       /* más compacta */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-align: center;
+}
+.cardCustom:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.cardHeader {
+  background: linear-gradient(90deg, #2575fc 0%, #6ecff6 100%);
+  color: #ffffff;
+  padding: 0.6rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cardHeader i {
+  margin-right: 0.4rem;
+  font-size: 1.1rem;
+}
+
+.cardBody {
+  flex-grow: 1;
+  padding: 0.8rem;
+  font-size: 0.85rem;
+  color: #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardButton {
+  background-color: #2575fc;
+  border: none;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0.5rem 0;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 70%;
+  margin: 0.8rem auto;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+.cardButton i {
+  margin-right: 0.3rem;
+}
+.cardButton:hover {
+  background-color: #1b5ccb;
+}
+
+/* ==== CONTENEDOR INTERNO PARA PÁGINAS DERIVADAS ==== */
+.contentCard {
+  background-color: #ffffff;
+  border: 2px solid #6ecff6;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 1rem;
+  margin: 1.5rem auto;
+  max-width: 1000px;
+}
+
+/* ==== RESPONSIVE ==== */
+@media (max-width: 1200px) {
+  .cardsRow {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .cardsRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .cardCustom {
+    max-width: 90%;
+    height: auto;
+  }
+}
+@media (max-width: 480px) {
+  .cardsRow {
+    grid-template-columns: 1fr;
+  }
+}

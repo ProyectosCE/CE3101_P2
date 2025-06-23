@@ -1,0 +1,155 @@
+/* src/styles/ConfigurationPage.module.css */
+
+/* ==== CONTENEDOR GLOBAL CONFIGURACIÓN (ligero degradado) ==== */
+.pageContainer {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5faff 0%, #ffffff 100%);
+  padding: 140px 2rem 2rem;  /* más espacio superior y laterales */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+/* ==== LOGO CENTRADO EN LA PARTE SUPERIOR ==== */
+.logoContainer {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+.logoImage {
+  max-width: 220px;
+  height: auto;
+  display: block;
+}
+
+/* ==== BOTONES ==== */
+.homeButton,
+.logoutButton {
+  position: absolute;
+  top: 16px;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.homeButton {
+  left: 16px;
+  background-color: #2575fc;
+  color: #fff;
+}
+.homeButton:hover {
+  background-color: #1b5ccb;
+}
+.logoutButton {
+  right: 16px;
+  background-color: #dc3545;
+  color: #fff;
+}
+.logoutButton:hover {
+  background-color: #c82333;
+}
+
+/* ==== ENCABEZADOS ==== */
+.mainHeader {
+  margin-top: 56px;
+  text-align: center;
+  font-size: 2.25rem;
+  font-weight: 700;
+}
+.mainHeader i {
+  margin-right: 0.5rem;
+  color: #2575fc;
+}
+.subHeader {
+  margin: 0.75rem auto 2.5rem;
+  text-align: center;
+  font-size: 1.2rem;
+  color: #555;
+  max-width: 900px;
+}
+
+/* ==== CONTENEDOR DE TARJETAS ==== */
+.sectionContainer {
+  background-color: #fff;
+  border: 2px solid #bbe1fa;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 3rem;
+  margin: 2.5rem auto;
+  max-width: 1400px;
+}
+
+/* ==== LAYOUT TARJETAS ==== */
+.cardsRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columnas para distribución 2x2 */
+  gap: 2rem;       /* espacio entre tarjetas */
+  justify-items: center;
+}
+@media (max-width: 768px) {
+  .cardsRow {
+    grid-template-columns: 1fr; /* en móvil una columna */
+    gap: 1rem;
+  }
+}
+
+/* ==== TARJETA ==== */
+.cardCustom {
+  background-color: #fff;
+  border: 1px solid #6ecff6;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  width: 350px;    /* ancho fijo consistente */
+  height: 400px;   /* altura fija consistente */
+}
+.cardCustom:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+.cardHeader {
+  background: linear-gradient(90deg, #2575fc 0%, #6ecff6 100%);
+  color: #fff;
+  padding: 1.2rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cardHeader i {
+  margin-right: 0.6rem;
+}
+.cardBody {
+  flex-grow: 1;
+  padding: 2rem;
+  font-size: 1.1rem;
+  color: #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cardButton {
+  margin: 1.5rem auto;
+  padding: 1rem 0;
+  width: 90%;
+  background-color: #2575fc;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.cardButton:hover {
+  background-color: #1b5ccb;
+}

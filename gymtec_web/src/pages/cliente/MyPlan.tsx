@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/ClientPage.module.css';
+import { API_URL } from '@/stores/api';
 
 export default function MyPlan() {
     const { user, logout } = useAuth();
@@ -14,7 +15,7 @@ export default function MyPlan() {
         const fetchPlan = async () => {
             if (!user?.id) return;
             try {
-                const res = await fetch(`/api/plantrabajo/${user.id}`);
+                const res = await fetch(`${API_URL}/api/plantrabajo/${user.id}`);
                 const data = await res.json();
                 if (data.success) setPlanTrabajo(data.data);
             } catch (err) {

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/ClientPage.module.css';
+import { API_URL } from '@/stores/api';
 
 export default function SearchAndRegisterClass() {
   const { user, logout } = useAuth();
@@ -22,7 +23,7 @@ export default function SearchAndRegisterClass() {
 
   const fetchClases = async () => {
     try {
-      const res = await fetch('/api/clase/clases_disponibles');
+      const res = await fetch(`${API_URL}/api/clase/clases_disponibles`);
       const data = await res.json();
       if (data.success) {
         setClases(data.data);

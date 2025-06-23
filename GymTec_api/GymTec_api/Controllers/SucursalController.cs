@@ -7,6 +7,7 @@ using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using System.Data;
+using NpgsqlTypes;
 
 namespace GymTec_api.Controllers
 {
@@ -29,6 +30,36 @@ namespace GymTec_api.Controllers
                     .Include(s => s.telefonos)
                     .ToList();
                 return Ok(new { success = true, data = sucursales });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
+        }
+
+        // POST: api/sucursal/copiar_clases
+        [HttpPost("copiar_clases")]
+        public IActionResult CopiarClasesSemana([FromBody] CopiarClasesDTO dto)
+        {
+            try
+            {
+                using var conn = _context.Database.GetDbConnection();
+                conn.Open();
+
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = "CALL copiar_clases_semana(@id_sucursal, @oldMon, @newMon)";
+
+                cmd.Parameters.Add(new NpgsqlParameter("@id_sucursal", NpgsqlDbType.Integer) { Value = dto.id_sucursal });
+                cmd.Parameters.Add(new NpgsqlParameter("@oldMon", NpgsqlDbType.Date) { Value = dto.start_monday.ToDateTime(TimeOnly.MinValue) });
+                cmd.Parameters.Add(new NpgsqlParameter("@newMon", NpgsqlDbType.Date) { Value = dto.new_start_monday.ToDateTime(TimeOnly.MinValue) });
+
+                cmd.ExecuteNonQuery();
+
+                return Ok(new { success = true, message = "Clases copiadas correctamente." });
+            }
+            catch (PostgresException pgEx)
+            {
+                return BadRequest(new { success = false, error = pgEx.MessageText });
             }
             catch (Exception ex)
             {
@@ -268,6 +299,13 @@ namespace GymTec_api.Controllers
         public int unidades_trabajadas { get; set; }
         public decimal monto_pagar { get; set; }
         public string nombre_sucursal { get; set; }
+    }
+
+    public class CopiarClasesDTO
+    {
+        public int id_sucursal { get; set; }
+        public DateOnly start_monday { get; set; }        // lunes origen
+        public DateOnly new_start_monday { get; set; }    // lunes destino
     }
 
 }

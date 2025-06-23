@@ -30,6 +30,23 @@ namespace GymTec_api.Controllers
             }
         }
 
+        // GET: api/cliente/sin_instructor
+        [HttpGet("sin_instructor")]
+        public IActionResult GetClientesSinInstructor()
+        {
+            try
+            {
+                var clientes = _context.cliente
+                    .Where(c => c.id_instructor == null)
+                    .ToList();
+                return Ok(new { success = true, data = clientes });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
+        }
+
         // POST: api/cliente
         [HttpPost]
         public IActionResult CreateCliente([FromBody] Cliente cliente)

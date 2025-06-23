@@ -128,6 +128,75 @@ END;
 $$;
 
 
+-- Copiar clases de una semana a otra
+
+CREATE OR REPLACE PROCEDURE copiar_clases_semana(
+    p_id_sucursal       INT,
+    p_start_monday      DATE,
+    p_new_start_monday  DATE
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    clase_record     clase%ROWTYPE;
+    fecha_offset     INTEGER;
+    p_end_date       DATE := p_start_monday + 6;          -- domingo origen
+    p_new_end_date   DATE := p_new_start_monday + 6;      -- domingo destino
+    count_origen     INT;
+    count_destino    INT;
+BEGIN
+    -- Validar que ambas fechas sean lunes
+    IF EXTRACT(DOW FROM p_start_monday) != 1
+       OR EXTRACT(DOW FROM p_new_start_monday) != 1 THEN
+        RAISE EXCEPTION 'Ambas fechas deben ser lunes.';
+    END IF;
+
+    -- Verificar que haya clases en la semana origen
+    SELECT COUNT(*) INTO count_origen
+    FROM clase
+    WHERE id_sucursal = p_id_sucursal
+      AND fecha BETWEEN p_start_monday AND p_end_date;
+
+    IF count_origen = 0 THEN
+        RAISE EXCEPTION 'No hay clases en la semana de origen.';
+    END IF;
+
+    -- Verificar que no haya clases en la semana destino
+    SELECT COUNT(*) INTO count_destino
+    FROM clase
+    WHERE id_sucursal = p_id_sucursal
+      AND fecha BETWEEN p_new_start_monday AND p_new_end_date;
+
+    IF count_destino > 0 THEN
+        RAISE EXCEPTION 'La semana destino ya tiene clases. Copia cancelada.';
+    END IF;
+
+    -- Copiar clases con desplazamiento de fecha
+    FOR clase_record IN
+        SELECT * FROM clase
+        WHERE id_sucursal = p_id_sucursal
+          AND fecha BETWEEN p_start_monday AND p_end_date
+    LOOP
+        fecha_offset := clase_record.fecha - p_start_monday;
+
+        INSERT INTO clase (
+            hora_inicio, hora_fin, grupal, capacidad,
+            fecha, id_instructor, id_servicio, id_sucursal
+        )
+        VALUES (
+            clase_record.hora_inicio,
+            clase_record.hora_fin,
+            clase_record.grupal,
+            clase_record.capacidad,
+            p_new_start_monday + fecha_offset,
+            clase_record.id_instructor,
+            clase_record.id_servicio,
+            clase_record.id_sucursal
+        );
+    END LOOP;
+END;
+$$;
+
 
 /*
     =========================================================

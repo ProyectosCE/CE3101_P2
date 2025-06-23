@@ -1,39 +1,85 @@
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Alert, KeyboardTypeOptions } from 'react-native';
 import { useState } from 'react';
 import { Colors } from '../constants/colors';
 import Logo from '../components/Logo';
 import { router } from 'expo-router';
 import { ROUTES } from '../constants/routes';
+import { registerCliente } from '../functions/registerApi';
 
 export default function RegisterScreen() {
   const [form, setForm] = useState({
     cedula: '',
-    nombre: '',
-    edad: '',
-    fechaNacimiento: '',
-    peso: '',
-    imc: '',
-    direccion: '',
+    nombres: '',
+    apellidos: '',
     correo: '',
     password: '',
+    fecha_nacimiento: '',
+    peso: '',
+    imc: '',
+    provincia: '',
+    canton: '',
+    distrito: '',
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (key: string, value: string) => {
     setForm({ ...form, [key]: value });
   };
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (Object.values(form).some(v => v === '')) {
       Alert.alert('Error', 'Por favor complete todos los campos');
       return;
     }
-
-    const clienteRegistrado = { ...form };
-    console.log('Cliente registrado:', clienteRegistrado);
-
-    Alert.alert('Registro exitoso', 'Ahora puedes iniciar sesión');
-    router.push(ROUTES.LOGIN);
+    setLoading(true);
+    try {
+      // Adaptar el payload para el backend
+      const res = await registerCliente({
+        cedula: form.cedula,
+        nombre: form.nombres,
+        apellidos: form.apellidos,
+        correo: form.correo,
+        password: form.password,
+        fechaNacimiento: form.fecha_nacimiento,
+        peso: form.peso,
+        imc: form.imc,
+        provincia: form.provincia,
+        canton: form.canton,
+        direccion: form.distrito,
+      } as any);
+      if (res && typeof res === 'string') {
+        Alert.alert('Registro exitoso', 'Ahora puedes iniciar sesión');
+        router.push(ROUTES.LOGIN);
+      } else {
+        Alert.alert('Error', 'No se pudo registrar el usuario');
+      }
+    } catch (err: any) {
+      Alert.alert('Error', err.message || 'No se pudo registrar el usuario');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // Define los campos y tipos de teclado explícitamente
+  const fields: {
+    key: keyof typeof form;
+    label: string;
+    placeholder: string;
+    secure?: boolean;
+    keyboardType?: KeyboardTypeOptions;
+  }[] = [
+    { key: 'cedula', label: 'Cédula', placeholder: 'Ej: 1238' },
+    { key: 'nombres', label: 'Nombre', placeholder: 'Ej: Alexander' },
+    { key: 'apellidos', label: 'Apellidos', placeholder: 'Ej: Vargas' },
+    { key: 'correo', label: 'Correo electrónico', placeholder: 'Ej: alex@gym.tem', keyboardType: 'email-address' },
+    { key: 'password', label: 'Contraseña', placeholder: 'Ej: pass123', secure: true },
+    { key: 'fecha_nacimiento', label: 'Fecha de nacimiento', placeholder: 'Ej: 25-28-2005' },
+    { key: 'peso', label: 'Peso (kg)', placeholder: 'Ej: 56', keyboardType: 'numeric' },
+    { key: 'imc', label: 'IMC', placeholder: 'Ej: 16', keyboardType: 'numeric' },
+    { key: 'provincia', label: 'Provincia', placeholder: 'Ej: Cartago' },
+    { key: 'canton', label: 'Cantón', placeholder: 'Ej: Cartago' },
+    { key: 'distrito', label: 'Distrito o Dirección completa', placeholder: 'Ej: Cartago, Cartago, Cartago' },
+  ];
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -42,31 +88,21 @@ export default function RegisterScreen() {
       </TouchableOpacity>
       <Logo />
       <Text style={styles.title}>Registro de Cliente</Text>
-      {[
-        { key: 'cedula', label: 'Cédula' },
-        { key: 'nombre', label: 'Nombre completo' },
-        { key: 'edad', label: 'Edad' },
-        { key: 'fechaNacimiento', label: 'Fecha de nacimiento (YYYY-MM-DD)' },
-        { key: 'peso', label: 'Peso (kg)' },
-        { key: 'imc', label: 'IMC' },
-        { key: 'direccion', label: 'Dirección' },
-        { key: 'correo', label: 'Correo electrónico' },
-        { key: 'password', label: 'Contraseña', secure: true },
-      ].map(({ key, label, secure }) => (
+      {fields.map(({ key, label, placeholder, secure, keyboardType }) => (
         <View key={key} style={styles.inputGroup}>
           <Text style={styles.inputLabel}>{label}</Text>
           <TextInput
             style={styles.input}
-            placeholder={label}
+            placeholder={placeholder}
             onChangeText={text => handleChange(key, text)}
             secureTextEntry={secure}
-            keyboardType={key === 'edad' || key === 'peso' || key === 'imc' ? 'numeric' : 'default'}
+            keyboardType={keyboardType}
             autoCapitalize="none"
           />
         </View>
       ))}
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Registrarse</Text>
+      <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
+        <Text style={styles.buttonText}>{loading ? 'Registrando...' : 'Registrarse'}</Text>
       </TouchableOpacity>
     </ScrollView>
   );

@@ -4,16 +4,32 @@ import { Colors } from '../constants/colors';
 import Logo from '../components/Logo';
 import { router } from 'expo-router';
 import { ROUTES } from '../constants/routes';
+import { loginUser } from '../functions/authApi';
 
 export default function LoginScreen() {
   const [correo, setCorreo] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    if (correo && password) {
-      router.push(ROUTES.HOME);
-    } else {
+  const handleLogin = async () => {
+    if (!correo || !password) {
       Alert.alert('Error', 'Por favor complete ambos campos');
+      return;
+    }
+    setLoading(true);
+    try {
+      // Solo rol CLIENTE para app móvil
+      const rest = await loginUser(correo, password, 'cliente');
+      // Solo pasar a home si success = true
+      if (rest && rest.id && rest.rol && rest.nombre) {
+        router.push(ROUTES.HOME);
+      } else {
+        Alert.alert('Error', 'No se pudo iniciar sesión');
+      }
+    } catch (err: any) {
+      Alert.alert('Error', err.message || 'No se pudo iniciar sesión');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,8 +59,8 @@ export default function LoginScreen() {
         />
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Ingresar</Text>
+      <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+        <Text style={styles.buttonText}>{loading ? 'Ingresando...' : 'Ingresar'}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => router.push(ROUTES.REGISTER)}>

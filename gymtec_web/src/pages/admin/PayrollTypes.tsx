@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/AdminPage.module.css';
+import { API_URL } from '@/stores/api';
 
 interface PayrollType {
   id_planilla: number;
   descripcion: string;
+  isDefault?: boolean; // <-- Agregar propiedad opcional
 }
 
 export default function PayrollTypes() {
@@ -18,11 +20,17 @@ export default function PayrollTypes() {
   const [formDesc, setFormDesc] = useState('');
 
   useEffect(() => {
-    fetch('/api/planilla')
+    fetch(`${API_URL}/api/planilla`)
         .then(res => res.json())
         .then(data => {
           if (data.success) {
-            setTypes(data.data);
+            // Marcar como default los ids 1, 2 y 3
+            setTypes(
+              data.data.map((t: any) => ({
+                ...t,
+                isDefault: [1, 2, 3].includes(t.id_planilla),
+              }))
+            );
           }
         })
         .catch(err => console.error('Error cargando planillas:', err));
@@ -48,7 +56,7 @@ export default function PayrollTypes() {
 
     try {
       if (isEditing) {
-        const res = await fetch(`/api/planilla/${isEditing.id_planilla}`, {
+        const res = await fetch(`${API_URL}/api/planilla/${isEditing.id_planilla}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...isEditing, descripcion: formDesc }),
@@ -56,18 +64,25 @@ export default function PayrollTypes() {
         const data = await res.json();
         if (data.success) {
           setTypes(prev =>
-              prev.map(t => t.id_planilla === isEditing.id_planilla ? data.data : t)
+              prev.map(t =>
+                t.id_planilla === isEditing.id_planilla
+                  ? { ...data.data, isDefault: [1, 2, 3].includes(data.data.id_planilla) }
+                  : t
+              )
           );
         }
       } else {
-        const res = await fetch('/api/planilla', {
+        const res = await fetch(`${API_URL}/api/planilla`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ descripcion: formDesc }),
         });
         const data = await res.json();
         if (data.success) {
-          setTypes(prev => [data.data, ...prev]);
+          setTypes(prev => [
+            { ...data.data, isDefault: [1, 2, 3].includes(data.data.id_planilla) },
+            ...prev,
+          ]);
         }
       }
       setShowModal(false);
@@ -80,7 +95,7 @@ export default function PayrollTypes() {
   const deleteType = async (id: number) => {
     if (!confirm('¿Confirma eliminar este tipo de planilla?')) return;
     try {
-      const res = await fetch(`/api/planilla/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_URL}/api/planilla/${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
         setTypes(prev => prev.filter(t => t.id_planilla !== id));
@@ -132,29 +147,37 @@ export default function PayrollTypes() {
             <table className="table table-bordered">
               <thead className="table-light">
               <tr>
-                <th>ID</th>
                 <th>Descripción</th>
+                <th>Por Defecto</th>
                 <th>Acciones</th>
               </tr>
               </thead>
               <tbody>
               {types.map(t => (
                   <tr key={t.id_planilla}>
-                    <td>{t.id_planilla}</td>
                     <td>{t.descripcion}</td>
+                    <td className="text-center">
+                      {t.isDefault
+                        ? <i className="fas fa-check text-success" />
+                        : <i className="fas fa-minus text-muted" />}
+                    </td>
                     <td>
-                      <button
-                          className="btn btn-sm btn-outline-secondary me-2"
-                          onClick={() => openEdit(t)}
-                      >
-                        <i className="fas fa-edit"></i>
-                      </button>
-                      <button
-                          className="btn btn-sm btn-outline-danger"
-                          onClick={() => deleteType(t.id_planilla)}
-                      >
-                        <i className="fas fa-trash"></i>
-                      </button>
+                      {!t.isDefault && (
+                        <>
+                          <button
+                              className="btn btn-sm btn-outline-secondary me-2"
+                              onClick={() => openEdit(t)}
+                          >
+                            <i className="fas fa-edit"></i>
+                          </button>
+                          <button
+                              className="btn btn-sm btn-outline-danger"
+                              onClick={() => deleteType(t.id_planilla)}
+                          >
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </>
+                      )}
                     </td>
                   </tr>
               ))}

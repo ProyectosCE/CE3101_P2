@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/AdminPage.module.css';
+import { API_URL } from '@/stores/api';
 
 interface Product {
   codigo_barra: string;
@@ -26,7 +27,7 @@ export default function ProductsPage() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('/api/producto');
+      const res = await fetch(`${API_URL}/api/producto`);
       const json = await res.json();
       if (!json.success) throw new Error(json.error || 'Error al cargar productos');
       setProducts(json.data);
@@ -64,7 +65,7 @@ export default function ProductsPage() {
   const handleDelete = async (codigo: string) => {
     if (!confirm('¿Confirma eliminación de este producto?')) return;
     try {
-      const res = await fetch(`/api/producto/${codigo}`, { method: 'DELETE' });
+      const res = await fetch(`${API_URL}/api/producto/${codigo}`, { method: 'DELETE' });
       const json = await res.json();
       if (!json.success) throw new Error(json.error);
       setProducts(products.filter(p => p.codigo_barra !== codigo));
@@ -86,7 +87,7 @@ export default function ProductsPage() {
         costo: Number(costoInput)
       };
       const res = await fetch(
-          editing ? `/api/producto/${editing.codigo_barra}` : '/api/producto',
+          editing ? `${API_URL}/api/producto/${editing.codigo_barra}` : `${API_URL}/api/producto`,
           {
             method: editing ? 'PATCH' : 'POST',
             headers: { 'Content-Type': 'application/json' },

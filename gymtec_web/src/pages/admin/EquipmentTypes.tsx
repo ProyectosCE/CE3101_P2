@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/AdminPage.module.css';
+import { API_BASE_URL } from '@/stores/api';
 
 interface EquipmentType {
   id_tipo_equipo: number;
@@ -11,40 +12,33 @@ interface EquipmentType {
   isDefault: boolean;
 }
 
-const defaultTypes: EquipmentType[] = [
-  { id_tipo_equipo: 1, descripcion: 'Cintas de correr', isDefault: true },
-  { id_tipo_equipo: 2, descripcion: 'Bicicletas estacionarias', isDefault: true },
-  { id_tipo_equipo: 3, descripcion: 'Multigimnasios', isDefault: true },
-  { id_tipo_equipo: 4, descripcion: 'Remos', isDefault: true },
-  { id_tipo_equipo: 5, descripcion: 'Pesas', isDefault: true },
-];
-
 export default function EquipmentTypes() {
   const { logout } = useAuth();
   const router = useRouter();
 
-  const [customTypes, setCustomTypes] = useState<EquipmentType[]>([]);
+  const [types, setTypes] = useState<EquipmentType[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<EquipmentType | null>(null);
   const [viewing, setViewing] = useState<EquipmentType | null>(null);
   const [descInput, setDescInput] = useState('');
 
   useEffect(() => {
-    fetch('/api/tipoequipo')
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            const loaded = data.data.map((t: any) => ({
-              id_tipo_equipo: t.id_tipo_equipo,
-              descripcion: t.descripcion,
-              isDefault: false,
-            }));
-            setCustomTypes(loaded);
-          } else {
-            alert('Error al cargar tipos de equipo');
-          }
-        })
-        .catch(() => alert('Error de servidor al cargar tipos de equipo'));
+    fetch(`${API_BASE_URL}/api/tipoequipo`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          // Marcar como default los ids 1-5
+          const loaded = data.data.map((t: any) => ({
+            id_tipo_equipo: t.id_tipo_equipo,
+            descripcion: t.descripcion,
+            isDefault: [1,2,3,4,5].includes(t.id_tipo_equipo),
+          }));
+          setTypes(loaded);
+        } else {
+          alert('Error al cargar tipos de equipo');
+        }
+      })
+      .catch(() => alert('Error de servidor al cargar tipos de equipo'));
   }, []);
 
   const handleLogout = () => {
@@ -69,10 +63,10 @@ export default function EquipmentTypes() {
   const deleteType = async (id: number) => {
     if (!confirm('¿Eliminar este tipo de equipo?')) return;
     try {
-      const res = await fetch(`/api/tipoequipo/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE_URL}/api/tipoequipo/${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (res.status === 200) {
-        setCustomTypes(customTypes.filter(t => t.id_tipo_equipo !== id));
+        setTypes(types.filter(t => t.id_tipo_equipo !== id));
         alert(data.mensaje);
       } else {
         alert(data.error || 'Error al eliminar tipo de equipo');
@@ -87,7 +81,7 @@ export default function EquipmentTypes() {
     if (!name) return alert('La descripción es obligatoria.');
 
     const method = editing ? 'PATCH' : 'POST';
-    const url = editing ? `/api/tipoequipo/${editing.id_tipo_equipo}` : '/api/tipoequipo';
+    const url = editing ? `${API_BASE_URL}/api/tipoequipo/${editing.id_tipo_equipo}` : `${API_BASE_URL}/api/tipoequipo`;
     try {
       const res = await fetch(url, {
         method,
@@ -100,15 +94,16 @@ export default function EquipmentTypes() {
       });
       const data = await res.json();
       if (res.status === 200) {
-        const listRes = await fetch('/api/tipoequipo');
+        // Refrescar lista desde API y marcar default
+        const listRes = await fetch(`${API_BASE_URL}/api/tipoequipo`);
         const listData = await listRes.json();
         if (listData.success) {
           const loaded = listData.data.map((t: any) => ({
             id_tipo_equipo: t.id_tipo_equipo,
             descripcion: t.descripcion,
-            isDefault: false,
+            isDefault: [1,2,3,4,5].includes(t.id_tipo_equipo),
           }));
-          setCustomTypes(loaded);
+          setTypes(loaded);
         }
         setShowModal(false);
       } else {
@@ -119,7 +114,7 @@ export default function EquipmentTypes() {
     }
   };
 
-  const allTypes = [...defaultTypes, ...customTypes];
+  const allTypes = types;
 
   return (
       <div className={styles.pageContainer}>
@@ -171,7 +166,6 @@ export default function EquipmentTypes() {
                       <button className="btn-close" onClick={() => setViewing(null)} />
                     </div>
                     <div className="modal-body">
-                      <p><strong>ID:</strong> {viewing.id_tipo_equipo}</p>
                       <p><strong>Descripción:</strong> {viewing.descripcion}</p>
                       <p><strong>Por Defecto:</strong> {viewing.isDefault ? 'Sí' : 'No'}</p>
                     </div>
@@ -187,7 +181,6 @@ export default function EquipmentTypes() {
             <table className="table table-bordered">
               <head className="table-light">
               <tr>
-                <th>ID</th>
                 <th>Descripción</th>
                 <th>Por Defecto</th>
                 <th>Acciones</th>
@@ -196,7 +189,6 @@ export default function EquipmentTypes() {
               <tbody>
               {allTypes.map(t => (
                   <tr key={t.id_tipo_equipo}>
-                    <td>{t.id_tipo_equipo}</td>
                     <td>{t.descripcion}</td>
                     <td className="text-center">{t.isDefault ? <i className="fas fa-check text-success" /> : <i className="fas fa-minus text-muted" />}</td>
                     <td className="text-center">

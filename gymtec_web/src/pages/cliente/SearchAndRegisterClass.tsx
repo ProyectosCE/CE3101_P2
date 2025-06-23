@@ -64,8 +64,24 @@ export default function SearchAndRegisterClass() {
 
       if (data.success) {
         alert('Inscripción exitosa: ' + data.mensaje);
-        // Puedes refrescar la lista si quieres actualizar cupos
-        fetchClases();
+        
+        // Refrescar lista de clases y volver a aplicar filtros
+        const res = await fetch(`${API_URL}/api/clase/clases_disponibles`);
+        const updated = await res.json();
+        if (updated.success) {
+          setClases(updated.data);
+          const result = updated.data.filter(c => {
+            const fechaClase = c.fecha.split('T')[0];
+            return (
+              (!sucursal || c.nombre_sucursal === sucursal) &&
+              (!servicio || c.nombre_servicio === servicio) &&
+              (!modalidad || (modalidad === 'Grupal' ? c.es_grupal : !c.es_grupal)) &&
+              (!fromDate || fechaClase >= fromDate) &&
+              (!toDate || fechaClase <= toDate)
+            );
+          });
+          setFilteredClases(result);
+        }
       } else {
         alert('Error al inscribirse: ' + data.error);
       }
@@ -73,6 +89,7 @@ export default function SearchAndRegisterClass() {
       alert('Error en la inscripción: ' + error);
     }
   };
+
 
   useEffect(() => {
     fetchClases();

@@ -12,7 +12,8 @@ interface Payroll { id_planilla: number; descripcion: string; }
 interface Employee {
   id_empleado: number;
   cedula: string;
-  nombre: string;
+  nombres: string;
+  apellidos: string
   provincia: string;
   canton: string;
   distrito: string;
@@ -29,20 +30,9 @@ export default function Employees() {
   const { logout } = useAuth();
   const router = useRouter();
 
-  const defaultPositions: Position[] = [
-    { id_puesto: 1, descripcion: 'Administrador', isDefault: true },
-    { id_puesto: 2, descripcion: 'Instructor', isDefault: true },
-    { id_puesto: 3, descripcion: 'Dependiente Spa', isDefault: true },
-    { id_puesto: 4, descripcion: 'Dependiente Tienda', isDefault: true },
-  ];
-  const payrolls: Payroll[] = [
-    { id_planilla: 1, descripcion: 'Pago Mensual' },
-    { id_planilla: 2, descripcion: 'Pago por Horas' },
-    { id_planilla: 3, descripcion: 'Pago por Clase' },
-  ];
-
-  const [positions, setPositions] = useState(defaultPositions);
+  const [positions, setPositions] = useState<Position[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
+  const [payrolls, setPayrolls] = useState<Payroll[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
 
   const [showModal, setShowModal] = useState(false);
@@ -51,42 +41,62 @@ export default function Employees() {
   const [viewing, setViewing] = useState<Employee | null>(null);
 
   const [form, setForm] = useState<Omit<Employee, 'id_empleado'>>({
-    cedula: '', nombre: '', provincia: '', canton: '', distrito: '',
-    id_puesto: defaultPositions[0].id_puesto,
-    id_sucursal: 0, id_planilla: payrolls[0].id_planilla,
+    cedula: '', nombres: '', apellidos:'', provincia: '', canton: '', distrito: '',
+    id_puesto: 0,
+    id_sucursal: 0, id_planilla: 0,
     salario: 0, correo: '', password: '', clases_horas: 0
   });
 
   useEffect(() => {
     // cargar sucursales
     fetch(`${API_BASE_URL}/api/sucursal`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            const b: Branch[] = data.data.map((s: any) => ({
-              id: s.id_sucursal, nombre: s.nombre_sucursal
-            }));
-            setBranches(b);
-            setForm(prev => ({ ...prev, id_sucursal: b[0]?.id || 0 }));
-          } else alert('Error al cargar sucursales');
-        }).catch(() => alert('Error servidor sucursales'));
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const b: Branch[] = data.data.map((s: any) => ({
+            id: s.id_sucursal, nombre: s.nombre_sucursal
+          }));
+          setBranches(b);
+          setForm(prev => ({ ...prev, id_sucursal: b[0]?.id || 0 }));
+        } else alert('Error al cargar sucursales');
+      }).catch(() => alert('Error servidor sucursales'));
+
+    // cargar puestos
+    fetch(`${API_BASE_URL}/api/puesto`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setPositions(data.data);
+          setForm(prev => ({ ...prev, id_puesto: data.data[0]?.id_puesto || 0 }));
+        } else alert('Error al cargar puestos');
+      }).catch(() => alert('Error servidor puestos'));
+
+    // cargar planillas
+    fetch(`${API_BASE_URL}/api/planilla`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setPayrolls(data.data);
+          setForm(prev => ({ ...prev, id_planilla: data.data[0]?.id_planilla || 0 }));
+        } else alert('Error al cargar planillas');
+      }).catch(() => alert('Error servidor planillas'));
 
     // cargar empleados
     fetch(`${API_BASE_URL}/api/empleado`)
-        .then(res => {
-          if (res.status === 401) throw new Error('No autorizado');
-          return res.json();
-        })
-        .then(data => {
-          if (data.success) setEmployees(data.data);
-          else alert('Error lista empleados');
-        })
-        .catch(err => {
-          if (err.message === 'No autorizado') {
-            alert('No autorizado');
-            logout(); router.push('/login');
-          } else alert('Error servidor empleados');
-        });
+      .then(res => {
+        if (res.status === 401) throw new Error('No autorizado');
+        return res.json();
+      })
+      .then(data => {
+        if (data.success) setEmployees(data.data);
+        else alert('Error lista empleados');
+      })
+      .catch(err => {
+        if (err.message === 'No autorizado') {
+          alert('No autorizado');
+          logout(); router.push('/login');
+        } else alert('Error servidor empleados');
+      });
   }, []);
 
   const handleLogout = () => { logout(); router.push('/login'); }
@@ -102,10 +112,10 @@ export default function Employees() {
   const openCreate = () => {
     setIsEditing(false); setEditingId(null);
     setForm({
-      cedula: '', nombre: '', provincia: '', canton: '', distrito: '',
-      id_puesto: positions[0].id_puesto,
+      cedula: '', nombres: '', apellidos:'', provincia: '', canton: '', distrito: '',
+      id_puesto: positions[0]?.id_puesto || 0,
       id_sucursal: branches[0]?.id || 0,
-      id_planilla: payrolls[0].id_planilla,
+      id_planilla: payrolls[0]?.id_planilla || 0,
       salario: 0, correo: '', password: '', clases_horas: 0
     });
     setShowModal(true);
@@ -136,7 +146,7 @@ export default function Employees() {
   };
 
   const saveEmployee = async () => {
-    const mandatory = form.cedula && form.nombre && form.provincia;
+    const mandatory = form.cedula && form.nombres && form.apellidos && form.provincia;
     if (!mandatory) return alert('Cédula, nombre y provincia son requeridos');
     try {
       const method = isEditing ? 'PATCH' : 'POST';
@@ -184,9 +194,102 @@ export default function Employees() {
           </button>
 
           {showModal &&
-              /* Modal Crear/Editar similar al original, omitiendo por brevedad */
-              /* ... */
-              null
+            <div
+              className="modal fade show"
+              tabIndex={-1}
+              style={{
+                display: 'block',
+                background: 'rgba(0,0,0,0.5)',
+                position: 'fixed',
+                top: 0, left: 0, right: 0, bottom: 0,
+                zIndex: 1050
+              }}
+              aria-modal="true"
+              role="dialog"
+            >
+              <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h4 className="modal-title">{isEditing ? 'Editar Empleado' : 'Nuevo Empleado'}</h4>
+                    <button type="button" className="btn-close" aria-label="Close" onClick={() => setShowModal(false)} />
+                  </div>
+                  <form onSubmit={e => { e.preventDefault(); saveEmployee(); }}>
+                    <div className="modal-body">
+                      <div className="row">
+                        <div className="mb-2 col-12 col-md-6">
+                          <label className="form-label">Cédula</label>
+                          <input id="cedula" className="form-control" value={form.cedula} onChange={handleChange} required />
+                        </div>
+                        <div className="mb-2 col-12 col-md-6">
+                          <label className="form-label">Nombres</label>
+                          <input id="nombres" className="form-control" value={form.nombres} onChange={handleChange} required />
+                        </div>
+                        <div className="mb-2 col-12 col-md-6">
+                          <label className="form-label">Apellidos</label>
+                          <input id="apellidos" className="form-control" value={form.apellidos} onChange={handleChange} required />
+                        </div>
+                        <div className="mb-2 col-12 col-md-6">
+                          <label className="form-label">Provincia</label>
+                          <input id="provincia" className="form-control" value={form.provincia} onChange={handleChange} required />
+                        </div>
+                        <div className="mb-2 col-12 col-md-6">
+                          <label className="form-label">Cantón</label>
+                          <input id="canton" className="form-control" value={form.canton} onChange={handleChange} />
+                        </div>
+                        <div className="mb-2 col-12 col-md-6">
+                          <label className="form-label">Distrito</label>
+                          <input id="distrito" className="form-control" value={form.distrito} onChange={handleChange} />
+                        </div>
+                        <div className="mb-2 col-12 col-md-6">
+                          <label className="form-label">Puesto</label>
+                          <select id="id_puesto" className="form-select" value={form.id_puesto} onChange={handleChange}>
+                            {positions.map(p => (
+                              <option key={p.id_puesto} value={p.id_puesto}>{p.descripcion}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="mb-2 col-12 col-md-6">
+                          <label className="form-label">Sucursal</label>
+                          <select id="id_sucursal" className="form-select" value={form.id_sucursal} onChange={handleChange}>
+                            {branches.map(b => (
+                              <option key={b.id} value={b.id}>{b.nombre}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="mb-2 col-12 col-md-6">
+                          <label className="form-label">Planilla</label>
+                          <select id="id_planilla" className="form-select" value={form.id_planilla} onChange={handleChange}>
+                            {payrolls.map(pl => (
+                              <option key={pl.id_planilla} value={pl.id_planilla}>{pl.descripcion}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="mb-2 col-12 col-md-6">
+                          <label className="form-label">Salario</label>
+                          <input id="salario" type="number" className="form-control" value={form.salario} onChange={handleChange} />
+                        </div>
+                        <div className="mb-2 col-12 col-md-6">
+                          <label className="form-label">Correo</label>
+                          <input id="correo" className="form-control" value={form.correo} onChange={handleChange} />
+                        </div>
+                        <div className="mb-2 col-12 col-md-6">
+                          <label className="form-label">Contraseña</label>
+                          <input id="password" type="password" className="form-control" value={form.password} onChange={handleChange} />
+                        </div>
+                        <div className="mb-2 col-12 col-md-6">
+                          <label className="form-label">Clases/Horas</label>
+                          <input id="clases_horas" type="number" className="form-control" value={form.clases_horas} onChange={handleChange} />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="modal-footer">
+                      <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancelar</button>
+                      <button type="submit" className="btn btn-primary">{isEditing ? 'Guardar Cambios' : 'Crear'}</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
           }
 
           {viewing &&
@@ -199,17 +302,23 @@ export default function Employees() {
             <table className="table table-bordered">
               <thead className="table-light">
               <tr>
-                <th>ID</th><th>Cédula</th><th>Nombre</th><th>Puesto</th>
-                <th>Sucursal</th><th>Planilla</th><th>Salario</th><th>Clases/Horas</th>
-                <th>Acciones</th>
+               <th>Cédula</th>
+               <th>Nombres</th>
+               <th>Apellidos</th>
+               <th>Puesto</th>
+               <th>Sucursal</th>
+               <th>Planilla</th>
+               <th>Salario</th>
+               <th>Clases/Horas</th>
+               <th>Acciones</th>
               </tr>
               </thead>
               <tbody>
               {employees.map(emp => (
                   <tr key={emp.id_empleado}>
-                    <td>{emp.id_empleado}</td>
                     <td>{emp.cedula}</td>
-                    <td>{emp.nombre}</td>
+                    <td>{emp.nombres}</td>
+                    <td>{emp.apellidos}</td>
                     <td>{positions.find(p => p.id_puesto === emp.id_puesto)?.descripcion}</td>
                     <td>{branches.find(b => b.id === emp.id_sucursal)?.nombre}</td>
                     <td>{payrolls.find(pl => pl.id_planilla === emp.id_planilla)?.descripcion}</td>

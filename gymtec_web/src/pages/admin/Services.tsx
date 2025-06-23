@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import styles from '../../styles/AdminPage.module.css';
+import { API_BASE_URL } from '@/stores/api';
 
 interface Service {
   id_servicio: number;
@@ -22,7 +23,7 @@ export default function ServicesPage() {
   const [descInput, setDescInput] = useState('');
 
   useEffect(() => {
-    fetch('/api/servicio')
+    fetch(`${API_BASE_URL}/api/servicio`)
         .then(res => res.json())
         .then(data => {
           if (data.success) setServices(data.data);
@@ -47,7 +48,7 @@ export default function ServicesPage() {
 
   const handleDelete = (id: number) => {
     if (!confirm('¿Confirma eliminación del servicio?')) return;
-    fetch(`/api/servicio/${id}`, { method: 'DELETE' })
+    fetch(`${API_BASE_URL}/api/servicio/${id}`, { method: 'DELETE' })
         .then(res => res.json())
         .then(data => {
           if (data.success) setServices(prev => prev.filter(s => s.id_servicio !== id));
@@ -61,7 +62,7 @@ export default function ServicesPage() {
     if (!desc) return alert('La descripción es obligatoria.');
 
     const method = editing ? 'PATCH' : 'POST';
-    const url = editing ? `/api/servicio/${editing.id_servicio}` : '/api/servicio';
+    const url = editing ? `${API_BASE_URL}/api/servicio/${editing.id_servicio}` : `${API_BASE_URL}/api/servicio`;
 
     fetch(url, {
       method,
@@ -153,7 +154,6 @@ export default function ServicesPage() {
                       <button className="btn-close" onClick={() => setViewing(null)} />
                     </div>
                     <div className="modal-body">
-                      <p><strong>ID:</strong> {viewing.id_servicio}</p>
                       <p><strong>Descripción:</strong> {viewing.descripcion}</p>
                       <p><strong>Por Defecto:</strong> {viewing.is_default ? 'Sí' : 'No'}</p>
                     </div>
@@ -171,7 +171,6 @@ export default function ServicesPage() {
             <table className="table table-bordered">
               <thead className="table-light">
               <tr>
-                <th>ID</th>
                 <th>Descripción</th>
                 <th>Por Defecto</th>
                 <th>Acciones</th>
@@ -180,7 +179,6 @@ export default function ServicesPage() {
               <tbody>
               {services.map(s => (
                   <tr key={s.id_servicio}>
-                    <td>{s.id_servicio}</td>
                     <td>{s.descripcion}</td>
                     <td className="text-center">
                       {s.is_default

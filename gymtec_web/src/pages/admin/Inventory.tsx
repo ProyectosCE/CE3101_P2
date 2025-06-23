@@ -133,17 +133,31 @@ export default function Inventory() {
           : `${API_URL}/api/maquina`;
       const method = editing ? 'PATCH' : 'POST';
 
+      // Asegurarse de enviar todos los campos correctamente, incluyendo id_tipo_equipo
+      const payload = {
+        id_tipo_equipo: Number(id_tipo_equipo),
+        marca,
+        num_serie,
+        costo: Number(costo),
+        // Asegura que la comparación sea solo contra null, no contra string
+        id_sucursal: id_sucursal === null ? null : Number(id_sucursal)
+      };
+
       const res = await fetch(endpoint, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.error || 'Error al guardar');
 
       if (editing) {
-        setMachines(machines.map(m => (m.id_maquina === editing.id_maquina ? { ...m, ...form } : m)));
+        setMachines(machines.map(m =>
+          m.id_maquina === editing.id_maquina
+            ? { ...m, ...payload }
+            : m
+        ));
       } else {
         setMachines([data.data, ...machines]);
       }
@@ -195,7 +209,7 @@ export default function Inventory() {
                         <label className="form-label">Tipo de Equipo</label>
                         <select id="id_tipo_equipo" className="form-select" value={form.id_tipo_equipo} onChange={handleChange}>
                           {equipmentTypes.map(t => (
-                              <option key={t.id_tipo_equipo} value={t.id_tipo_equipo}>{t.nombre}</option>
+                              <option key={t.id_tipo_equipo} value={t.id_tipo_equipo}>{t.descripcion}</option>
                           ))}
                         </select>
                       </div>
@@ -240,8 +254,7 @@ export default function Inventory() {
                       <button className="btn-close" onClick={() => setViewing(null)} />
                     </div>
                     <div className="modal-body">
-                      <p><strong>ID:</strong> {viewing.id_maquina}</p>
-                      <p><strong>Tipo:</strong> {equipmentTypes.find(t => t.id_tipo_equipo === viewing.id_tipo_equipo)?.nombre}</p>
+                      <p><strong>Tipo:</strong> {equipmentTypes.find(t => t.id_tipo_equipo === viewing.id_tipo_equipo)?.descripcion}</p>
                       <p><strong>Marca:</strong> {viewing.marca}</p>
                       <p><strong>Serie:</strong> {viewing.num_serie}</p>
                       <p><strong>Costo:</strong> {viewing.costo}</p>
@@ -262,7 +275,6 @@ export default function Inventory() {
             <table className="table table-bordered">
               <thead className="table-light">
               <tr>
-                <th>ID</th>
                 <th>Tipo</th>
                 <th>Marca</th>
                 <th>Serie</th>
@@ -274,8 +286,7 @@ export default function Inventory() {
               <tbody>
               {machines.map(m => (
                   <tr key={m.id_maquina}>
-                    <td>{m.id_maquina}</td>
-                    <td>{equipmentTypes.find(t => t.id_tipo_equipo === m.id_tipo_equipo)?.nombre}</td>
+                    <td>{equipmentTypes.find(t => t.id_tipo_equipo === m.id_tipo_equipo)?.descripcion}</td>
                     <td>{m.marca}</td>
                     <td>{m.num_serie}</td>
                     <td>{m.costo}</td>

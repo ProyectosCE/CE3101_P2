@@ -138,7 +138,6 @@ export default function SpaTreatments() {
             <table className="table table-bordered">
               <thead className="table-light">
               <tr>
-                <th>ID</th>
                 <th>Nombre</th>
                 <th>Por Defecto</th>
                 <th>Acciones</th>
@@ -147,7 +146,6 @@ export default function SpaTreatments() {
               <tbody>
               {treatments.map(t => (
                   <tr key={t.id_tratamiento}>
-                    <td>{t.id_tratamiento}</td>
                     <td>{t.nombre_tratamiento}</td>
                     <td className="text-center">
                       {t.is_default

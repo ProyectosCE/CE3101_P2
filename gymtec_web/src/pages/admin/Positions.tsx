@@ -70,18 +70,17 @@ export default function Positions() {
   };
 
   const handleSave = async () => {
-    if (!descInput.trim() || !detailInput.trim()) {
-      alert('Debe ingresar nombre y descripción del puesto.');
+    if (!descInput.trim()) {
+      alert('Debe ingresar nombre del puesto.');
       return;
     }
     const body = {
       id_puesto: editing?.id_puesto,
       descripcion: descInput,
-      detalle: detailInput,
       is_default: false
     };
     try {
-      const res = await fetch(editing ? `${API_BASE_URL}/api/puesto/${editing.id_puesto}` : '/api/puesto', {
+      const res = await fetch(editing ? `${API_BASE_URL}/api/puesto/${editing.id_puesto}` : `${API_BASE_URL}/api/puesto`, {
         method: editing ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
@@ -138,15 +137,6 @@ export default function Positions() {
                             onChange={e => setDescInput(e.target.value)}
                         />
                       </div>
-                      <div className="mb-3">
-                        <label className="form-label">Descripción Detallada</label>
-                        <textarea
-                            className="form-control"
-                            rows={3}
-                            value={detailInput}
-                            onChange={e => setDetailInput(e.target.value)}
-                        />
-                      </div>
                     </div>
                     <div className="modal-footer">
                       <button className="btn btn-secondary" onClick={() => setShowModal(false)}>
@@ -172,9 +162,7 @@ export default function Positions() {
                       <button className="btn-close" onClick={() => setViewing(null)} />
                     </div>
                     <div className="modal-body">
-                      <p><strong>ID:</strong> {viewing.id_puesto}</p>
                       <p><strong>Nombre:</strong> {viewing.descripcion}</p>
-                      <p><strong>Descripción:</strong> {viewing.detalle}</p>
                       <p><strong>Por Defecto:</strong> {viewing.is_default ? 'Sí' : 'No'}</p>
                     </div>
                     <div className="modal-footer">
@@ -191,7 +179,7 @@ export default function Positions() {
             <table className="table table-bordered">
               <thead className="table-light">
               <tr>
-                <th>ID</th>
+
                 <th>Nombre</th>
                 <th>Por Defecto</th>
                 <th>Acciones</th>
@@ -200,7 +188,6 @@ export default function Positions() {
               <tbody>
               {positions.map(p => (
                   <tr key={p.id_puesto}>
-                    <td>{p.id_puesto}</td>
                     <td>{p.descripcion}</td>
                     <td className="text-center">
                       {p.is_default

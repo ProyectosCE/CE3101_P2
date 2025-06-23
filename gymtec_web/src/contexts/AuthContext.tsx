@@ -74,12 +74,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem('gymtec_user', JSON.stringify(nuevoUsuario));
 
       // Redirije
-      const rutas: Record<User['rol'], string> = {
-        ADMIN: '/admin',
-        CLIENTE: '/cliente',
-        INSTRUCTOR: '/instructor',
-      };
-      router.replace(rutas[rol]);
+      switch (rol) {
+        case 'ADMIN':
+          router.replace('/admin/Dashboard');
+          break;
+        case 'CLIENTE':
+          router.replace('/cliente/Dashboard');
+          break;
+        case 'INSTRUCTOR':
+          router.replace('/instructor/Dashboard');
+          break;
+      }
     } catch (err: any) {
       console.error('[AuthContext] login error:', err.message);
       throw err;

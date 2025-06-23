@@ -8,7 +8,6 @@ import { useRouter } from 'next/router';
 import { useAuth } from '../hooks/useAuth';
 import { useEffect } from 'react';
 import Header from '../components/Layout/Header';
-import Sidebar from '../components/Layout/SideBar';
 import Spinner from '../components/Common/Spinner';
 
 function AppWrapper({ Component, pageProps }: AppProps) {
@@ -37,8 +36,9 @@ function AppWrapper({ Component, pageProps }: AppProps) {
       return;
     }
 
-    // Si está autenticado y está en una ruta base o login, redirige al dashboard según rol
-    if (isAuthenticated && (ruta === '/login' || ruta === '/admin' || ruta === '/cliente' || ruta === '/instructor')) {
+    // Si está autenticado y está en una ruta base, login o home, redirige al dashboard según rol
+    if (isAuthenticated && (ruta === '/login' || ruta === '/admin' || ruta === '/cliente' || 
+        ruta === '/instructor' || ruta === '/')) {
       switch (user?.rol) {
         case 'ADMIN':
           router.replace('/admin/Dashboard');
@@ -78,9 +78,8 @@ function AppWrapper({ Component, pageProps }: AppProps) {
 
   return (
     <>
-      {/* Se muestra Header y Sidebar únicamente si el usuario está autenticado */}
+      {/* Se muestra Header únicamente si el usuario está autenticado */}
       {isAuthenticated && <Header />}
-      {isAuthenticated && <Sidebar />}
       <Component {...pageProps} />
     </>
   );
